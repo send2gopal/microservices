@@ -2,11 +2,11 @@
     "Routes": [
         {
             "DownstreamPathTemplate": "/catalog/{url}",
-            "DownstreamScheme": "https",
+            "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
                 {
                     "Host": "localhost",
-                    "Port": 80
+                    "Port": 5209
                 }
             ],
             "UpstreamPathTemplate": "/catalog/{url}",
@@ -16,6 +16,6 @@
         }
     ],
     "GlobalConfiguration": {
-        "BaseUrl": "https://localhost:7098"
+        "BaseUrl": "https://localhost:5284"
     }
 }
