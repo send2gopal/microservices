@@ -1,19 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30114.105
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "microkart.gateway", "microkart.gateway\microkart.gateway.csproj", "{7CD8CCAE-191F-4871-9D1E-0E54B8813B07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "microkart.gateway", "microkart.gateway\microkart.gateway.csproj", "{7CD8CCAE-191F-4871-9D1E-0E54B8813B07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "microkart.catalog", "microkart.catalog\microkart.catalog.csproj", "{693D2AC2-1025-4B52-86C4-AE1F7DCBD6FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "microkart.catalog", "microkart.catalog\microkart.catalog.csproj", "{693D2AC2-1025-4B52-86C4-AE1F7DCBD6FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "microkart.identity", "microkart.identity\microkart.identity.csproj", "{1E4A4F54-3AB9-429B-AC9D-67813413A1C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{7CD8CCAE-191F-4871-9D1E-0E54B8813B07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -24,5 +23,15 @@ Global
 		{693D2AC2-1025-4B52-86C4-AE1F7DCBD6FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{693D2AC2-1025-4B52-86C4-AE1F7DCBD6FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{693D2AC2-1025-4B52-86C4-AE1F7DCBD6FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E4A4F54-3AB9-429B-AC9D-67813413A1C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E4A4F54-3AB9-429B-AC9D-67813413A1C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E4A4F54-3AB9-429B-AC9D-67813413A1C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E4A4F54-3AB9-429B-AC9D-67813413A1C9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0967D584-6EE2-470E-A80B-C76044697329}
 	EndGlobalSection
 EndGlobal

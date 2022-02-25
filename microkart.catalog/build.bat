@@ -1,0 +1,1 @@
+docker build --rm -t microkart.catalog:latest .
