@@ -1,1 +1,1 @@
-docker build --rm -t microkart.identity:latest .
+docker build --rm -t microkart.identity:v1 .

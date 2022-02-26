@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "microkart.gateway", "microk
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "microkart.catalog", "microkart.catalog\microkart.catalog.csproj", "{693D2AC2-1025-4B52-86C4-AE1F7DCBD6FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "microkart.identity", "microkart.identity\microkart.identity.csproj", "{1E4A4F54-3AB9-429B-AC9D-67813413A1C9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "microkart.identity", "microkart.identity\microkart.identity.csproj", "{44B78FE2-4FB0-4C72-A754-24029D5397F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{693D2AC2-1025-4B52-86C4-AE1F7DCBD6FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{693D2AC2-1025-4B52-86C4-AE1F7DCBD6FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{693D2AC2-1025-4B52-86C4-AE1F7DCBD6FA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1E4A4F54-3AB9-429B-AC9D-67813413A1C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1E4A4F54-3AB9-429B-AC9D-67813413A1C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1E4A4F54-3AB9-429B-AC9D-67813413A1C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1E4A4F54-3AB9-429B-AC9D-67813413A1C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44B78FE2-4FB0-4C72-A754-24029D5397F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44B78FE2-4FB0-4C72-A754-24029D5397F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44B78FE2-4FB0-4C72-A754-24029D5397F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44B78FE2-4FB0-4C72-A754-24029D5397F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
