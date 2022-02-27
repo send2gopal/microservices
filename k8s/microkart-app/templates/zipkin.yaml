@@ -1,0 +1,49 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: zipkin
+  namespace: default
+  generation: 1
+  labels:
+    app: zipkin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zipkin
+  template:
+    metadata:
+      labels:
+        app: zipkin
+    spec:
+      containers:
+        - name: zipkin
+          image: openzipkin/zipkin
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 9411
+              protocol: TCP
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: zipkin
+  namespace: default
+  labels:
+    app: zipkin
+spec:
+  ports:
+    - protocol: TCP
+      port: 9411
+      targetPort: 9411
+  selector:
+    app: zipkin
+  type: LoadBalancer
+
+
+

@@ -1,9 +1,39 @@
+namespace: microkart-app
 database:
   enabled : true
-deployment:
+gateway:
+  image: "microkart-gateway"
+  tag:  "v1"
+  name: "microkart-gateway"
+  port: 6999
+  dbserver: payment-db
+identity:
   image: "microkart-identity"
   tag:  "v1"
-name: "microkart-identity"
-port: 7000
-namespace: microkart-app
-dbserver: identity-db
+  name: "microkart-identity"
+  port: 7000
+  dbserver: identity-db
+catalog:
+  image: "microkart-catalog"
+  tag:  "v1"
+  name: "microkart-catalog"
+  port: 7001
+  dbserver: catalog-db
+cart:
+  image: "microkart-cart"
+  tag:  "v1"
+  name: "microkart-cart"
+  port: 7002
+  dbserver: cart-db
+order:
+  image: "microkart-order"
+  tag:  "v1"
+  name: "microkart-order"
+  port: 7003
+  dbserver: order-db
+payment:
+  image: "microkart-payment"
+  tag:  "v1"
+  name: "microkart-payment"
+  port: 7003
+  dbserver: payment-db
