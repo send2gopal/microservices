@@ -1,0 +1,10 @@
+database:
+  enabled : true
+deployment:
+  image: "identity"
+  tag:  "v1"
+name: "identity-db"
+replicas : 1
+persistentvolume:
+  name: identity-db
+namespace: microkart-app

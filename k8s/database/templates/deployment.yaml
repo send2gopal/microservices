@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.name}}
+  namespace: {{.Values.namespace}}
+spec:
+  replicas: {{.Values.replicas}}
+  selector:
+     matchLabels:
+       app: {{.Values.name}}
+  template:
+    metadata:
+      labels:
+        app: {{.Values.name}}
+    spec:
+      terminationGracePeriodSeconds: 30
+      hostname: {{.Values.name}}
+      securityContext:
+        fsGroup: 10001
+      containers:
+      - name: {{.Values.name}}
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        ports:
+        - containerPort: 1433
+        env:
+        - name: MSSQL_PID
+          value: "Developer"
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: SA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: microkart-app-secret
+              key: SA_PASSWORD 
+        volumeMounts:
+        - name: {{.Values.name}}
+          mountPath: /var/opt/mssql
+      volumes:
+      - name: {{.Values.name}}
+        persistentVolumeClaim:
+          claimName: {{.Values.persistentvolume.name}}-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.name}}
+  namespace: {{.Values.namespace}}
+spec:
+  selector:
+    app: {{.Values.name}}
+  ports:
+    - protocol: TCP
+      port: 1433
+      targetPort: 1433
+  type: LoadBalancer

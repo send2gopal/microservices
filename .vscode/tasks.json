@@ -36,6 +36,26 @@
                 "${workspaceFolder}/microkart.identity/microkart.identity.csproj"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "bridge-to-kubernetes.resource",
+            "type": "bridge-to-kubernetes.resource",
+            "resource": "microkart-identity",
+            "resourceType": "service",
+            "ports": [
+                80
+            ],
+            "targetCluster": "docker-desktop",
+            "targetNamespace": "microkart-app",
+            "useKubernetesServiceEnvironmentVariables": false
+        },
+        {
+            "label": "bridge-to-kubernetes.compound",
+            "dependsOn": [
+                "bridge-to-kubernetes.resource",
+                "build"
+            ],
+            "dependsOrder": "sequence"
         }
     ]
 }
