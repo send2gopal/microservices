@@ -1,5 +1,0 @@
-controller:
-  podAnnotations:
-    dapr.io/app-port: "80"
-    dapr.io/log-as-json: "true"
-    dapr.io/config: "dapr-config"

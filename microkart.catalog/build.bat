@@ -1,1 +1,1 @@
-docker build --rm -t microkart.catalog:latest .
+docker build --rm -t microkart-catalog:v1 .

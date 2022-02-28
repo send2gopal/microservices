@@ -59,6 +59,13 @@ data:
                       auto_host_rewrite: true
                       prefix_rewrite: "/v1.0/invoke/microkart-catalog/method/"
                       cluster: dapr
+                  - name: "identity"
+                    match:
+                      prefix: "/identity/"
+                    route:
+                      auto_host_rewrite: true
+                      prefix_rewrite: "/v1.0/invoke/microkart-identity/method/"
+                      cluster: dapr
                   - name: "o-short"
                     match:
                       prefix: "/o/"
