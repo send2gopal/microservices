@@ -39,7 +39,7 @@ metadata:
 spec:
   ports:
     - protocol: TCP
-      port: 9411
+      port: 9412
       targetPort: 9411
   selector:
     app: zipkin

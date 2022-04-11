@@ -30,7 +30,7 @@ spec:
         - name: SA_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: microkart-app-secret
+              name: microkart-app-secret-database
               key: SA_PASSWORD 
         volumeMounts:
         - name: {{.Values.name}}

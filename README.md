@@ -44,3 +44,9 @@ https://docs.dapr.io/operations/monitoring/logging/fluentd/
 
 # Expose kibana to 5601
 kubectl port-forward svc/kibana-kibana 5601 -n dapr-monitoring
+# Start Proxy 
+Kubectl proxy
+
+
+# Install minio as object storage
+helm install --namespace minio --set rootUser=rootuser,rootPassword=rootpass123 --generate-name minio/minio

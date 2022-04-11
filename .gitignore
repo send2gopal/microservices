@@ -64,6 +64,10 @@ artifacts/
 # StyleCop
 StyleCopReport.xml
 
+#node_modules
+node_modules/
+.angular/
+dist/
 # Files built by Visual Studio
 *_i.c
 *_p.c

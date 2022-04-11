@@ -7,4 +7,4 @@ name: "identity-db"
 replicas : 1
 persistentvolume:
   name: identity-db
-namespace: microkart-app
+namespace: microkart-app-database

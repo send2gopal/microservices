@@ -18,22 +18,22 @@ catalog:
   tag:  "v1"
   name: "microkart-catalog"
   port: 7001
-  dbserver: catalog-db
+  dbserver: identity-db
 cart:
   image: "microkart-cart"
   tag:  "v1"
   name: "microkart-cart"
   port: 7002
-  dbserver: cart-db
+  dbserver: identity-db
 order:
   image: "microkart-order"
   tag:  "v1"
   name: "microkart-order"
   port: 7003
-  dbserver: order-db
+  dbserver: identity-db
 payment:
   image: "microkart-payment"
   tag:  "v1"
   name: "microkart-payment"
   port: 7003
-  dbserver: payment-db
+  dbserver: identity-db
