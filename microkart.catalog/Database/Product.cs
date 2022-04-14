@@ -1,35 +1,30 @@
-﻿using microkart.shared.Database;
-using System.ComponentModel.DataAnnotations;
-
+using microkart.catalog.Database;
+using microkart.shared.Database;
 namespace microkart.catalog.Database
 {
+   
+
+    
+
     public class Product : BaseEntity
     {
+        public string Title { get; set; }
+        public string description { get; set; }
+        public string type { get; set; }
 
-        [MaxLength(100)]
-        [Required]
-        public string Name { get; set; }
+        public List<string> collection { get; set; }
 
-        [MaxLength(500)]
-        [Required]
-        public string Description { get; set; }
+        public int price { get; set; }
+        public bool sale { get; set; }
+        public string discount { get; set; }
+        public int stock { get; set; }
+        public bool IsNew { get; set; }
 
-        [Required]
-        public decimal Price { get; set; }
-
-        [Required]
-        public int Discount { get; set; }
-
-        [Required]
-        public int QuantityInStock { get; set; }
-
-        [Required]
-        public bool IsDeleted { get; set; }
-
-        public string Pitchures { get; set; }
-
-        public virtual ProductCatagory ProductCatagory { get; set; } = null!;
-
-        public virtual Brand Brand { get; private set; } = null!;
+        //Navigation Properties
+        public virtual Brand Brand { get; set; }
+        public virtual ProductCatagory Category { get; set; }
+        public virtual List<string> tags { get; set; } = null!;
+        public virtual List<Variant> variants { get; set; } = null!;
+        public virtual List<ProductImage> images { get; set; } = null!;
     }
 }

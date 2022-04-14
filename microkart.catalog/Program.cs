@@ -1,8 +1,4 @@
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using microkart.servicehealth;
-using Dapr.Client;
-using microkart.catalog.Database;
-using Microsoft.EntityFrameworkCore;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,15 +33,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-try
-{
-    app.ApplyDatabaseMigration();
 
-    app.Run();
-}
-catch (Exception ex)
-{
-}
-finally
-{
-}
+app.ApplyDatabaseMigration();
+
+app.Run();
+
