@@ -8,6 +8,8 @@ namespace microkart.catalog.Database
         public DbSet<Product> Products => Set<Product>();
         public DbSet<ProductCatagory> ProductCatagories => Set<ProductCatagory>();
 
+        public DbSet<ProductImages> ProductImages => Set<ProductImages>();
+        
         public CatalogDatabaseContext(DbContextOptions<CatalogDatabaseContext> options)
             : base(options)
         {

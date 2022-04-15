@@ -17,11 +17,11 @@ namespace microkart.catalog.Database
 
         public string collection { get; set; }
         [Required]
-        public int price { get; set; }
+        public decimal price { get; set; }
         [Required]
         public bool sale { get; set; }
         [Required]
-        public string discount { get; set; }
+        public int discount { get; set; }
         [Required]
         public int stock { get; set; }
         [Required]
@@ -31,6 +31,6 @@ namespace microkart.catalog.Database
         //Navigation Properties
         public virtual Brand Brand { get; set; }
         public virtual ProductCatagory Category { get; set; }
-        public virtual ProductImage images { get; set; } = null!;
+        public virtual ProductImages images { get; set; } = null!;
     }
 }
