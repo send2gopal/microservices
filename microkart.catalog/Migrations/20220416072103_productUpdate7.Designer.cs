@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using microkart.catalog.Database;
 
@@ -11,9 +12,10 @@ using microkart.catalog.Database;
 namespace microkart.catalog.Migrations
 {
     [DbContext(typeof(CatalogDatabaseContext))]
-    partial class CatalogDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220416072103_productUpdate7")]
+    partial class productUpdate7
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -246,9 +248,6 @@ namespace microkart.catalog.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("productId")
-                        .HasColumnType("int");
-
                     b.Property<int>("productImagesId")
                         .HasColumnType("int");
 
@@ -266,8 +265,6 @@ namespace microkart.catalog.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("productId");
 
                     b.HasIndex("productImagesId");
 
@@ -306,19 +303,11 @@ namespace microkart.catalog.Migrations
 
             modelBuilder.Entity("microkart.catalog.Database.ProductVariant", b =>
                 {
-                    b.HasOne("microkart.catalog.Database.Product", "product")
-                        .WithMany()
-                        .HasForeignKey("productId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("microkart.catalog.Database.ProductImages", "productImages")
                         .WithMany()
                         .HasForeignKey("productImagesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("product");
 
                     b.Navigation("productImages");
                 });

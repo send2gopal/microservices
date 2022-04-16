@@ -7,6 +7,8 @@ namespace microkart.catalog.Database
  
     public class Product : BaseEntity
     {
+        public int product_Id { get; set; } = 0;
+
         [MaxLength(100)]
         [Required]
         public string Title { get; set; }
@@ -31,6 +33,5 @@ namespace microkart.catalog.Database
         //Navigation Properties
         public virtual Brand Brand { get; set; }
         public virtual ProductCatagory Category { get; set; }
-        public virtual ProductImages images { get; set; } = null!;
     }
 }

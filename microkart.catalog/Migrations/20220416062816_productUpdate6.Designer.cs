@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using microkart.catalog.Database;
 
@@ -11,9 +12,10 @@ using microkart.catalog.Database;
 namespace microkart.catalog.Migrations
 {
     [DbContext(typeof(CatalogDatabaseContext))]
-    partial class CatalogDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220416062816_productUpdate6")]
+    partial class productUpdate6
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,61 +221,6 @@ namespace microkart.catalog.Migrations
                     b.ToTable("ProductImages");
                 });
 
-            modelBuilder.Entity("microkart.catalog.Database.ProductVariant", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CraetedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UpdatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("color")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("productId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("productImagesId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("size")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("sku")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("variant_id")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("productId");
-
-                    b.HasIndex("productImagesId");
-
-                    b.ToTable("ProductVariant");
-                });
-
             modelBuilder.Entity("microkart.catalog.Database.Product", b =>
                 {
                     b.HasOne("microkart.catalog.Database.Brand", "Brand")
@@ -302,25 +249,6 @@ namespace microkart.catalog.Migrations
                         .IsRequired();
 
                     b.Navigation("product");
-                });
-
-            modelBuilder.Entity("microkart.catalog.Database.ProductVariant", b =>
-                {
-                    b.HasOne("microkart.catalog.Database.Product", "product")
-                        .WithMany()
-                        .HasForeignKey("productId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("microkart.catalog.Database.ProductImages", "productImages")
-                        .WithMany()
-                        .HasForeignKey("productImagesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("product");
-
-                    b.Navigation("productImages");
                 });
 #pragma warning restore 612, 618
         }

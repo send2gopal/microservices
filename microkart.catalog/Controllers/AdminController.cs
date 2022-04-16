@@ -98,8 +98,6 @@ public class AdminController : ControllerBase
 
         var brand = catalogDatabaseContext.Brands.Where(x => x.Id == model.brandID).FirstOrDefault();
 
-        var productImage = catalogDatabaseContext.ProductImages.Where(x => x.Id == model.imageId).FirstOrDefault();
-
         var product = new Product
         {
             Title = model.title,
@@ -110,15 +108,14 @@ public class AdminController : ControllerBase
             IsNew = model.IsNew,
             sale = model.sale,
             type = model.type,
-            tags = model.tags,
+            tags = model.tagsVal,
             CraetedDate = DateTime.Now,
             CreatedBy = "gthakur",
             UpdatedBy = "gthakur",
             UpdatedDate = DateTime.Now,
             Category = productCatagory,
             Brand = brand,
-            collection = model.collection,
-            images = productImage
+            collection = model.collectionVal,
         };
 
         var Prodctresult = await catalogDatabaseContext.Products.AddAsync(product);
@@ -130,12 +127,13 @@ public class AdminController : ControllerBase
     [ProducesResponseType(typeof(List<Product>), (int)HttpStatusCode.OK)]
     public Task<List<ProductViewModel>> ProductsAsync()
     {
+        
         var products = (from product in catalogDatabaseContext.Products
                         join brand in catalogDatabaseContext.Brands on product.Brand.Id equals brand.Id
                         join category in catalogDatabaseContext.ProductCatagories on product.Category.Id equals category.Id
-                        join images in catalogDatabaseContext.ProductImages on product.images.Id equals images.Id
                         select new ProductViewModel
                         {
+                            id = product.Id,
                             title = product.Title,
                             description = product.description,
                             price = product.price,
@@ -144,15 +142,16 @@ public class AdminController : ControllerBase
                             IsNew = product.IsNew,
                             sale = product.sale,
                             type = product.type,
-                            tags = product.tags,
+                            tags = product.tags.Split(",", System.StringSplitOptions.None),
                             createdDate = product.CraetedDate,
                             createdBy = product.CreatedBy,
                             updatedBy = product.UpdatedBy,
                             updatedDate = product.UpdatedDate,
                             categoryName = category.Name,
-                            brandName = brand.Name,
-                            collection = product.collection,
-                            imagesrc = images.src
+                            brand = brand.Name,
+                            collection = product.collection.Split(",", System.StringSplitOptions.None),
+                            images= catalogDatabaseContext.ProductImages.Where(x => x.product.Id ==product.Id).ToList(),
+                            variants = catalogDatabaseContext.ProductVariant.Where(x => x.product.Id == product.Id).ToList()
                         }).ToListAsync();
 
 
