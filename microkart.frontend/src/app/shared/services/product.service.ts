@@ -32,8 +32,6 @@ export class ProductService {
 
   // Product
   private get products(): Observable<Product[]> {
-    var data= this.http.get<any[]>("https://localhost:7266/api/Admin/products").pipe(map(data => data));
-    console.log(data);
     //this.Products = this.http.get<Product[]>('assets/data/products.json').pipe(map(data => data));
     this.Products=this.http.get<Product[]>("https://localhost:7266/api/Admin/products").pipe(map(data => data));
     this.Products.subscribe(next => { localStorage['products'] = JSON.stringify(next) });

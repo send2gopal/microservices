@@ -14,7 +14,7 @@ public class AdminController : ControllerBase
     private readonly CatalogDatabaseContext catalogDatabaseContext;
     public AdminController(CatalogDatabaseContext context, ILogger<CatalogController> logger)
     {
-        this.catalogDatabaseContext = context;
+        this.catalogDatabaseContext = context ?? throw new Exception("DB context is null.");
         this.logger = logger;
         //catalogDatabaseContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
@@ -23,28 +23,29 @@ public class AdminController : ControllerBase
 
     [HttpGet("brands")]
     [ProducesResponseType(typeof(List<Brand>), (int)HttpStatusCode.OK)]
-    public Task<List<Brand>> BrandsAsync()
+    public async Task<IEnumerable<Brand>> BrandsAsync()
     {
-        return catalogDatabaseContext.Brands.ToListAsync();
+        return await catalogDatabaseContext.Brands.ToListAsync();
     }
 
     [HttpPost("brands")]
     [ProducesResponseType(typeof(Brand), 201)]
     public async Task<Brand> BrandsCreateAsync(BrandModel model)
     {
-        var brand = new Brand
-        {
-            Id = model.Id,
-            BannerImage = model.BannerImage,
-            Description = model.Description,
-            Logo = model.Logo,
-            Name = model.Name,
-            CraetedDate = DateTime.Now,
-            CreatedBy = "gthakur",
-            UpdatedBy = "gthakur",
-            UpdatedDate = DateTime.Now,
-        };
-        var result = await catalogDatabaseContext.Brands.AddAsync(brand);
+        var result = await catalogDatabaseContext.Brands.AddAsync(
+            new Brand
+            {
+                Id = model.Id,
+                BannerImage = model.BannerImage,
+                Description = model.Description,
+                Logo = model.Logo,
+                Name = model.Name,
+                CraetedDate = DateTime.Now,
+                CreatedBy = "gthakur",
+                UpdatedBy = "gthakur",
+                UpdatedDate = DateTime.Now,
+            }
+            );
         await catalogDatabaseContext.SaveChangesAsync();
         return result.Entity;
     }
@@ -57,7 +58,7 @@ public class AdminController : ControllerBase
         return catalogDatabaseContext.Brands.ToListAsync();
     }
 
-    
+
 
     [HttpPost("brands")]
     [ProducesResponseType(typeof(Brand), 201)]
@@ -116,6 +117,23 @@ public class AdminController : ControllerBase
             Category = productCatagory,
             Brand = brand,
             collection = model.collectionVal,
+            Variants = new List<ProductVariant> { 
+                new ProductVariant {
+                    sku="sku1",
+                    size="s",
+                    color="White"   
+                },
+                new ProductVariant {
+                     sku="sku2",
+                    size="m",
+                    color="Yellow"
+                },
+                new ProductVariant {
+                     sku="sku3",
+                    size="m",
+                    color="pink"
+                },
+            }
         };
 
         var Prodctresult = await catalogDatabaseContext.Products.AddAsync(product);
@@ -127,7 +145,7 @@ public class AdminController : ControllerBase
     [ProducesResponseType(typeof(List<Product>), (int)HttpStatusCode.OK)]
     public Task<List<ProductViewModel>> ProductsAsync()
     {
-        
+
         var products = (from product in catalogDatabaseContext.Products
                         join brand in catalogDatabaseContext.Brands on product.Brand.Id equals brand.Id
                         join category in catalogDatabaseContext.ProductCatagories on product.Category.Id equals category.Id
@@ -150,8 +168,8 @@ public class AdminController : ControllerBase
                             categoryName = category.Name,
                             brand = brand.Name,
                             collection = product.collection.Split(",", System.StringSplitOptions.None),
-                            images= catalogDatabaseContext.ProductImages.Where(x => x.product.Id ==product.Id).ToList(),
-                            variants = catalogDatabaseContext.ProductVariant.Where(x => x.product.Id == product.Id).ToList()
+                            images = product.Images,
+                            variants = product.Variants
                         }).ToListAsync();
 
 
@@ -160,11 +178,24 @@ public class AdminController : ControllerBase
     }
 
     [HttpPut("UpdateProduct/{Id}")]
-    [ProducesResponseType((int)HttpStatusCode.Accepted)]
-    public async Task<bool> Update(Product model)
+    [ProducesResponseType(typeof(Product), 200)]
+    public async Task<IActionResult> Update(Product model)
     {
-        catalogDatabaseContext.Entry(await catalogDatabaseContext.Products.FirstOrDefaultAsync(x => x.Id == model.Id)).CurrentValues.SetValues(model);
-        return (await catalogDatabaseContext.SaveChangesAsync()) > 0;
+        var product = await catalogDatabaseContext.Products.FirstOrDefaultAsync(x => x.Id == model.Id);
+        if (product == null) return NotFound();
+        product.Title = model.Title;
+        product.description = model.description;
+        product.price = model.price;
+        product.discount = model.discount;
+        product.stock = model.stock;
+        product.IsNew = product.IsNew;
+        product.sale = model.sale;
+        product.type = model.type;
+        product.tags = model.tags;
+
+        //TBD mappings
+        await catalogDatabaseContext.SaveChangesAsync();
+        return Ok(product);
     }
 
     [HttpDelete("RemoveProduct/{Id}")]
@@ -172,12 +203,45 @@ public class AdminController : ControllerBase
     public IActionResult ProductDeleteAsync(int id)
     {
         var productTobeDeletetd = catalogDatabaseContext.Products.Find(id);
+        if (productTobeDeletetd == null) return NotFound();
         catalogDatabaseContext.Products.Remove(productTobeDeletetd);
         catalogDatabaseContext.SaveChanges();
-        return Ok(productTobeDeletetd);
+        return Accepted();
     }
 
 
-    #endregion
+    [HttpPost("MapProductImage")]
+    [Consumes("multipart/form-data")]
+    public async Task<ProductImages> UploadProdcutImageFile([FromForm] ImageModel model)
+    {
+        string fName = model.Image.FileName;
+        string path = Path.Combine(Environment.CurrentDirectory, "Images/" + model.Image.FileName);
+        var product = catalogDatabaseContext.Products.Where(x => x.Id == model.productId).FirstOrDefault();
+
+        //Wil change to AWS s3
+        using (var stream = new FileStream(path, FileMode.Create))
+        {
+            await model.Image.CopyToAsync(stream);
+        }
+
+        var productImage = new ProductImages
+        {
+            src = path,
+            CraetedDate = DateTime.Now,
+            CreatedBy = "gthakur",
+            UpdatedBy = "gthakur",
+            UpdatedDate = DateTime.Now,
+            product = product
+        };
+
+        var Prodctresult = await catalogDatabaseContext.ProductImages.AddAsync(productImage);
+
+        await catalogDatabaseContext.SaveChangesAsync();
+        return Prodctresult.Entity;
+    }
 
 }
+
+#endregion
+
+

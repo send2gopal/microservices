@@ -33,5 +33,7 @@ namespace microkart.catalog.Database
         //Navigation Properties
         public virtual Brand Brand { get; set; }
         public virtual ProductCatagory Category { get; set; }
+        public virtual List<ProductImages> Images { get; set; }
+        public virtual List<ProductVariant> Variants { get; set; }
     }
 }
