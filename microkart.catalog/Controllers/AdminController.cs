@@ -192,8 +192,6 @@ public class AdminController : ControllerBase
         product.sale = model.sale;
         product.type = model.type;
         product.tags = model.tags;
-
-        //TBD mappings
         await catalogDatabaseContext.SaveChangesAsync();
         return Ok(product);
     }
