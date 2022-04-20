@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "microkart.identity", "micro
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "microkart.shared", "microkart.servicehealth\microkart.shared.csproj", "{CAAB1AE0-A831-4A13-8350-FAE047CC8632}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "microkart.basket", "microkart.basket\microkart.basket.csproj", "{485A4CF4-A945-41B2-935A-A770AF56E144}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{CAAB1AE0-A831-4A13-8350-FAE047CC8632}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CAAB1AE0-A831-4A13-8350-FAE047CC8632}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CAAB1AE0-A831-4A13-8350-FAE047CC8632}.Release|Any CPU.Build.0 = Release|Any CPU
+		{485A4CF4-A945-41B2-935A-A770AF56E144}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{485A4CF4-A945-41B2-935A-A770AF56E144}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{485A4CF4-A945-41B2-935A-A770AF56E144}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{485A4CF4-A945-41B2-935A-A770AF56E144}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

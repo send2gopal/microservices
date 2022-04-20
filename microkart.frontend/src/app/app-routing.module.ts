@@ -4,8 +4,10 @@ import { Routes, RouterModule } from '@angular/router';
 import { ShopComponent } from './shop/shop.component';
 import { PagesComponent } from './pages/pages.component';
 import { ElementsComponent } from './elements/elements.component';
+import { SigninRedirectCallbackComponent } from './signin-redirect-callback/signin-redirect-callback.component';
 
 const routes: Routes = [
+  { path: 'signin-callback', component: SigninRedirectCallbackComponent },
   {
     path: '',
     redirectTo: 'home/electronics',
@@ -33,6 +35,7 @@ const routes: Routes = [
     path: '**', // Navigate to Home Page if not found any page
     redirectTo: 'pages/404',
   },
+  
 ];
 
 @NgModule({

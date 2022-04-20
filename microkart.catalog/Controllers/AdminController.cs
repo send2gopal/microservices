@@ -1,8 +1,12 @@
+using Amazon;
+using Amazon.S3;
+using Amazon.S3.Transfer;
 using microkart.catalog.Database;
 using microkart.catalog.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using Nanoid;
 
 namespace microkart.catalog.Controllers;
 
@@ -12,10 +16,12 @@ public class AdminController : ControllerBase
 {
     private readonly ILogger<CatalogController> logger;
     private readonly CatalogDatabaseContext catalogDatabaseContext;
-    public AdminController(CatalogDatabaseContext context, ILogger<CatalogController> logger)
+    private readonly IConfiguration config;
+    public AdminController(IConfiguration config, CatalogDatabaseContext context, ILogger<CatalogController> logger)
     {
         this.catalogDatabaseContext = context ?? throw new Exception("DB context is null.");
         this.logger = logger;
+        this.config = config;
         //catalogDatabaseContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
 
@@ -56,36 +62,6 @@ public class AdminController : ControllerBase
     public Task<List<Brand>> BrandsDeleteAsync()
     {
         return catalogDatabaseContext.Brands.ToListAsync();
-    }
-
-
-
-    [HttpPost("brands")]
-    [ProducesResponseType(typeof(Brand), 201)]
-    public async Task<Brand> ProductCreateAsync(ProductModel model)
-    {
-        var brand = new Brand
-        {
-            Id = model.Id,
-            BannerImage = model.BannerImage,
-            Description = model.Description,
-            Logo = model.Logo,
-            Name = model.Name,
-            CraetedDate = DateTime.Now,
-            CreatedBy = "gthakur",
-            UpdatedBy = "gthakur",
-            UpdatedDate = DateTime.Now,
-        };
-        var result = await catalogDatabaseContext.Brands.AddAsync(brand);
-        await catalogDatabaseContext.SaveChangesAsync();
-        return result.Entity;
-    }
-
-    [HttpDelete("brands/{Id}")]
-    [ProducesResponseType((int)HttpStatusCode.Accepted)]
-    public Task ProductDeleteAsync()
-    {
-        return catalogDatabaseContext.Products.ToListAsync();
     }
 
     #region Product
@@ -210,21 +186,20 @@ public class AdminController : ControllerBase
 
     [HttpPost("MapProductImage")]
     [Consumes("multipart/form-data")]
-    public async Task<ProductImages> UploadProdcutImageFile([FromForm] ImageModel model)
+    public async Task<ActionResult<ProductImages>> UploadProdcutImageFile([FromForm] ImageModel model)
     {
-        string fName = model.Image.FileName;
-        string path = Path.Combine(Environment.CurrentDirectory, "Images/" + model.Image.FileName);
         var product = catalogDatabaseContext.Products.Where(x => x.Id == model.productId).FirstOrDefault();
+        if (product == null) return NotFound();
+        var awsConfig = GetAwsConfig();
 
-        //Wil change to AWS s3
-        using (var stream = new FileStream(path, FileMode.Create))
-        {
-            await model.Image.CopyToAsync(stream);
-        }
+        await UploadToS3(model.Image, awsConfig);
+
+        string s3FileName = $"{ await Nanoid.Nanoid.GenerateAsync(size: 10) }.{ Path.GetExtension(model.Image.FileName)}";
 
         var productImage = new ProductImages
         {
-            src = path,
+
+            src = string.Concat(awsConfig.S3Url, $"/{s3FileName}"),
             CraetedDate = DateTime.Now,
             CreatedBy = "gthakur",
             UpdatedBy = "gthakur",
@@ -235,10 +210,48 @@ public class AdminController : ControllerBase
         var Prodctresult = await catalogDatabaseContext.ProductImages.AddAsync(productImage);
 
         await catalogDatabaseContext.SaveChangesAsync();
+
         return Prodctresult.Entity;
     }
 
+    private async Task UploadToS3(IFormFile file, AwsConfigOptions awsConfig)
+    {
+        //for this example, try giving S3 full permissions
+        using (var client = new AmazonS3Client(awsConfig.Accesskey, awsConfig.Secret, RegionEndpoint.USWest1))
+        {
+            using (var newMemoryStream = new MemoryStream())
+            {
+                file.CopyTo(newMemoryStream);
+
+                var uploadRequest = new TransferUtilityUploadRequest
+                {
+                    InputStream = newMemoryStream,
+                    Key = file.FileName, // filename
+                    BucketName = "microkart" 
+                };
+
+                var fileTransferUtility = new TransferUtility(client);
+                await fileTransferUtility.UploadAsync(uploadRequest);
+            }
+        }
+    }
+
+    private AwsConfigOptions GetAwsConfig()
+    {
+        var awsOptions = config.GetSection(AwsConfigOptions.AwsConfig)
+                                                     .Get<AwsConfigOptions>();
+        //var accesskey = builder.Configuration["AwsConfig:AccessKey"];
+        //var secret = builder.Configuration["AwsConfig:Secret"];
+
+        //return new AwsOptions
+        //{
+        //    Accesskey = accesskey,
+        //    Secret = secret
+        //};
+        return awsOptions;
+    }
 }
+
 
 #endregion
 
