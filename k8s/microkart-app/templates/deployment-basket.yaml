@@ -1,29 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.Values.catalog.name}}
+  name: {{.Values.basket.name}}
   labels:
-    app: {{.Values.catalog.name}}
+    app: {{.Values.basket.name}}
   namespace: {{.Values.namespace}}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{.Values.catalog.name}}
+      app: {{.Values.basket.name}}
   template:
     metadata:
       annotations:
         dapr.io/enabled: "true"
-        dapr.io/app-id: "{{.Values.catalog.name}}"
+        dapr.io/app-id: "{{.Values.basket.name}}"
         dapr.io/app-port: "80"
         dapr.io/log-as-json: "true"
         dapr.io/config: "dapr-config"
       labels:
-        app: {{.Values.catalog.name}}
+        app: {{.Values.basket.name}}
     spec:
       containers:
-      - name: {{.Values.catalog.name}}
-        image: {{.Values.catalog.image}}:{{.Values.catalog.tag}}
+      - name: {{.Values.basket.name}}
+        image: {{.Values.basket.image}}:{{.Values.basket.tag}}
         imagePullPolicy: Never
         ports:
         - containerPort: 80

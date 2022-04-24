@@ -1,18 +1,19 @@
 ﻿using microkart.identity.Services.Identity.API;
 
-var appName = "Identity API";
+var appName = "Identity Server";
 var builder = WebApplication.CreateBuilder();
 
 builder.AddCustomConfiguration();
-//builder.AddCustomSerilog();
+builder.AddCustomSerilog();
 builder.AddCustomMvc();
-builder.AddDbContextAsyncDevelopment();
-//await builder.AddDbContextAsync();
+//builder.AddDbContextAsyncDevelopment();
+await builder.AddDbContextAsync();
 builder.AddCustomIdentity();
 builder.AddCustomIdentityServer();
 builder.AddCustomAuthentication();
 builder.AddCustomHealthChecks();
 builder.AddCustomApplicationServices();
+builder.AddNonBreakingSameSiteCookies();
 
 var app = builder.Build();
 
@@ -23,8 +24,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 
+// Add this before any other middleware that might write cookies
+//app.UseCookiePolicy();
 // This cookie policy fixes login issues with Chrome 80+ using HHTP
-app.UseCookiePolicy(new CookiePolicyOptions { MinimumSameSitePolicy = SameSiteMode.Lax });
+app.UseCookiePolicy(new CookiePolicyOptions { MinimumSameSitePolicy = SameSiteMode.Strict });
 
 app.UseRouting();
 app.UseIdentityServer();
@@ -49,9 +52,9 @@ try
     // Apply database migration automatically. Note that this approach is not
     // recommended for production scenarios. Consider generating SQL scripts from
     // migrations instead.
-    using (var scope = app.Services.CreateScope())
+    // using (var scope = app.Services.CreateScope())
     {
-        await SeedData.EnsureSeedData(scope, app.Configuration, app.Logger);
+        //await SeedData.EnsureSeedData(scope, app.Configuration, app.Logger);
     }
 
     app.Logger.LogInformation("Starting web host ({ApplicationName})...", appName);

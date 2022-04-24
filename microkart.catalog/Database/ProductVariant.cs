@@ -5,6 +5,13 @@ namespace microkart.catalog.Database
 {
     public class ProductVariant : BaseEntity
     {
+        public ProductVariant()
+        {
+            CreatedBy = "gthakur";
+            UpdatedBy = "gthakur";
+            CraetedDate = DateTime.Now;
+            UpdatedDate = DateTime.Now;
+        }
         [MaxLength(50)]
         public string sku { get; set; }
         [MaxLength(10)]

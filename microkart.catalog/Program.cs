@@ -5,7 +5,7 @@ using microkart.servicehealth;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors();
-
+builder.AddSerilog();
 // Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -16,8 +16,8 @@ builder.Services.AddHealthChecks()
     .AddDapr();
 builder.Services.AddDaprClient();
 
-//builder.AddDbContextDevelopment();
-await builder.AddDbContextAsync();
+builder.AddDbContextDevelopment();
+//await builder.AddDbContextAsync();
 
 var app = builder.Build();
 
@@ -48,7 +48,19 @@ app.MapControllers();
 
 
 
-app.ApplyDatabaseMigration();
+//app.ApplyDatabaseMigration();
 
-app.Run();
+try
+{
+    app.Logger.LogInformation("Starting web host ({ApplicationName})...", StartupExtensions.AppName);
+    app.Run();
+}
+catch (Exception ex)
+{
+    app.Logger.LogCritical(ex, "Host terminated unexpectedly ({ApplicationName})...", StartupExtensions.AppName);
+}
+finally
+{
+    Serilog.Log.CloseAndFlush();
+}
 

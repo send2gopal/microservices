@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { map, startWith, delay } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Product } from '../classes/product';
-
+import { environment } from '../../../environments/environment';
 const state = {
   products: JSON.parse(localStorage['products'] || '[]'),
   wishlist: JSON.parse(localStorage['wishlistItems'] || '[]'),
@@ -19,10 +19,15 @@ export class ProductService {
 
   public Currency = { name: 'Dollar', currency: 'USD', price: 1 } // Default Currency
   public OpenCart: boolean = false;
-  public Products
+  public Products;
+
+  private baseURl = "";
 
   constructor(private http: HttpClient,
-    private toastrService: ToastrService) { }
+    private toastrService: ToastrService) {
+
+      this.baseURl = environment.apiRoot + '/c/Api'
+     }
 
   /*
     ---------------------------------------------
@@ -33,7 +38,7 @@ export class ProductService {
   // Product
   private get products(): Observable<Product[]> {
     //this.Products = this.http.get<Product[]>('assets/data/products.json').pipe(map(data => data));
-    this.Products=this.http.get<Product[]>("https://localhost:7266/api/Admin/products").pipe(map(data => data));
+    this.Products=this.http.get<Product[]>(this.baseURl+"/Admin/products").pipe(map(data => data));
     this.Products.subscribe(next => { localStorage['products'] = JSON.stringify(next) });
     console.log(this.Products+"ff");
 

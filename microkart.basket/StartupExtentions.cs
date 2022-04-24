@@ -4,9 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using static microkart.shared.Constants.Dapr;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+
+namespace Microkart.basket;
 public static class StartupExtensions
 {
-    private const string AppName = "Basket API";
+    public const string AppName = "Basket Service";
 
     public static async Task AddDbContextAsync(this WebApplicationBuilder builder)
     {
@@ -21,6 +26,20 @@ public static class StartupExtensions
         builder.Services.AddDbContext<BasketDatabaseContext>(
                    options => options.UseSqlServer(defaultConnectionString));
 
+    }
+
+    public static void AddSerilog(this WebApplicationBuilder builder)
+    {
+        var seqServerUrl = builder.Configuration["SeqServerUrl"];
+        Console.WriteLine($"seqServerUrl: {seqServerUrl}");
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(builder.Configuration)
+            .WriteTo.Console()
+            .WriteTo.Seq(seqServerUrl)
+            .Enrich.WithProperty("ApplicationName", AppName)
+            .CreateLogger();
+
+        builder.Host.UseSerilog();
     }
 
     public static void AddDbContextDevelopment(this WebApplicationBuilder builder)
@@ -42,9 +61,8 @@ public static class StartupExtensions
         context.Database.Migrate();
     }
 
-    public static void AddCustomAuthentication(this WebApplicationBuilder builder)
+    public static void AddIdentityServerAuthentication(this WebApplicationBuilder builder)
     {
-        // Prevent mapping "sub" claim to nameidentifier.
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("sub");
 
         builder.Services.AddAuthentication("Bearer")
@@ -56,7 +74,7 @@ public static class StartupExtensions
             });
     }
 
-    public static void AddCustomAuthorization(this WebApplicationBuilder builder)
+    public static void AddIdentityServerAuthorization(this WebApplicationBuilder builder)
     {
         builder.Services.AddAuthorization(options =>
         {

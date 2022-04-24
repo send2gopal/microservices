@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { UserManager, User, UserManagerSettings } from 'oidc-client';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -9,7 +9,7 @@ import { environment } from '../../../environments/environment';
 export class AuthService {
   private _userManager: UserManager;
   private _user: User;
-  private _loginChangedSubject = new Subject<boolean>();
+  private _loginChangedSubject = new BehaviorSubject<boolean>(false);
   public loginChanged = this._loginChangedSubject.asObservable();
 
   private get idpSettings(): UserManagerSettings {

@@ -5,9 +5,11 @@ import { ShopComponent } from './shop/shop.component';
 import { PagesComponent } from './pages/pages.component';
 import { ElementsComponent } from './elements/elements.component';
 import { SigninRedirectCallbackComponent } from './signin-redirect-callback/signin-redirect-callback.component';
+import { SignoutRedirectCallbackComponent } from './signout-redirect-callback/signout-redirect-callback.component';
 
 const routes: Routes = [
   { path: 'signin-callback', component: SigninRedirectCallbackComponent },
+  { path: 'signout-callback', component: SignoutRedirectCallbackComponent },
   {
     path: '',
     redirectTo: 'home/electronics',

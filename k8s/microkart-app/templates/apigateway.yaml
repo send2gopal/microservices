@@ -92,14 +92,14 @@ data:
                       prefix: "/b/"
                     route:
                       auto_host_rewrite: true
-                      prefix_rewrite: "/v1.0/invoke/basket-api/method/"
+                      prefix_rewrite: "/v1.0/invoke/microkart-basket/method/"
                       cluster: dapr
                   - name: "b-long"
                     match:
-                      prefix: "/basket-api/"
+                      prefix: "/basket/"
                     route:
                       auto_host_rewrite: true
-                      prefix_rewrite: "/v1.0/invoke/basket-api/method/"
+                      prefix_rewrite: "/v1.0/invoke/microkart-basket/method/"
                       cluster: dapr
                   - name: "agg"
                     match:

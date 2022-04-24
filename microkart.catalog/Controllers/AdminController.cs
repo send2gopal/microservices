@@ -97,7 +97,8 @@ public class AdminController : ControllerBase
                 new ProductVariant {
                     sku="sku1",
                     size="s",
-                    color="White"   
+                    color="White",
+                    
                 },
                 new ProductVariant {
                      sku="sku2",

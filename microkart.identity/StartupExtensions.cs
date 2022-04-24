@@ -4,7 +4,7 @@ namespace microkart.identity.Services.Identity.API;
 
 public static class StartupExtensions
 {
-    private const string AppName = "Identity API";
+    private const string AppName = "Identity Server";
 
     public static void AddCustomConfiguration(this WebApplicationBuilder builder)
     {
@@ -13,7 +13,7 @@ public static class StartupExtensions
     public static void AddCustomSerilog(this WebApplicationBuilder builder)
     {
         var seqServerUrl = builder.Configuration["SeqServerUrl"];
-
+        Console.WriteLine($"seqServerUrl: {seqServerUrl}");
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(builder.Configuration)
             .WriteTo.Console()
@@ -27,6 +27,12 @@ public static class StartupExtensions
     public static void AddCustomMvc(this WebApplicationBuilder builder)
     {
         builder.Services.AddControllersWithViews();
+    }
+
+    public static void AddNonBreakingSameSiteCookies(this WebApplicationBuilder builder)
+    {
+        // Add this
+        //builder.Services.ConfigureNonBreakingSameSiteCookies();
     }
 
     public static async Task AddDbContextAsync(this WebApplicationBuilder builder)

@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (web) with Kubernetes",
+            "name": "microkart.identityLaunch (web) with Kubernetes",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "bridge-to-kubernetes.compound",
@@ -12,7 +12,24 @@
             "stopAtEntry": false,
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
-                "ASPNETCORE_URLS": "http://+:80"
+                "ASPNETCORE_URLS": "http://+:8085"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": "microkart.Basket with Kubernetes",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "bridge-to-kubernetes.compound",
+            "program": "${workspaceFolder}/microkart.basket/bin/Debug/net6.0/microkart.basket.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/microkart.basket",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "http://+:8085"
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
