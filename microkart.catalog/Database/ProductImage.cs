@@ -5,10 +5,9 @@ namespace microkart.catalog.Database
 {
     public class ProductImages : BaseEntity
     {
-        public int image_id { get; set; }
-        public string alt { get; set; }
-        public string src { get; set; }
-        public virtual Product product{get;set;}
+        public string AltText { get; set; }
+        public string Source { get; set; }
+        public virtual Product Product{get;set;}
 
     }
 }

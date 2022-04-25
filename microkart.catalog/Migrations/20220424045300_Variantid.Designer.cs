@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using microkart.catalog.Database;
 
@@ -11,9 +12,10 @@ using microkart.catalog.Database;
 namespace microkart.catalog.Migrations
 {
     [DbContext(typeof(CatalogDatabaseContext))]
-    partial class CatalogDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220424045300_Variantid")]
+    partial class Variantid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -184,10 +186,6 @@ namespace microkart.catalog.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("AltText")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CraetedDate")
                         .HasColumnType("datetime2");
 
@@ -195,15 +193,8 @@ namespace microkart.catalog.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ProductVariantvariant_id")
+                    b.Property<string>("ProductVariantvarivariant_id")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Source")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")
                         .IsRequired()
@@ -212,19 +203,32 @@ namespace microkart.catalog.Migrations
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("alt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("image_id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("productId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("src")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("ProductVariantvarivariant_id");
 
-                    b.HasIndex("ProductVariantvariant_id");
+                    b.HasIndex("productId");
 
                     b.ToTable("ProductImages");
                 });
 
             modelBuilder.Entity("microkart.catalog.Database.ProductVariant", b =>
                 {
-                    b.Property<string>("variant_id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("varivariant_id")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("color")
@@ -245,7 +249,7 @@ namespace microkart.catalog.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.HasKey("variant_id");
+                    b.HasKey("varivariant_id");
 
                     b.HasIndex("productId");
 
@@ -273,17 +277,17 @@ namespace microkart.catalog.Migrations
 
             modelBuilder.Entity("microkart.catalog.Database.ProductImages", b =>
                 {
-                    b.HasOne("microkart.catalog.Database.Product", "Product")
+                    b.HasOne("microkart.catalog.Database.ProductVariant", null)
+                        .WithMany("productImages")
+                        .HasForeignKey("ProductVariantvarivariant_id");
+
+                    b.HasOne("microkart.catalog.Database.Product", "product")
                         .WithMany("Images")
-                        .HasForeignKey("ProductId")
+                        .HasForeignKey("productId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("microkart.catalog.Database.ProductVariant", null)
-                        .WithMany("productImages")
-                        .HasForeignKey("ProductVariantvariant_id");
-
-                    b.Navigation("Product");
+                    b.Navigation("product");
                 });
 
             modelBuilder.Entity("microkart.catalog.Database.ProductVariant", b =>

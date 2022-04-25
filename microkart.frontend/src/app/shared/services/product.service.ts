@@ -25,8 +25,10 @@ export class ProductService {
 
   constructor(private http: HttpClient,
     private toastrService: ToastrService) {
-
-      this.baseURl = environment.apiRoot + '/c/Api'
+      if(environment.production)
+        this.baseURl = environment.apiRoot + '/c/Api';
+      else      
+        this.baseURl = 'https://localhost:7266/Api';
      }
 
   /*

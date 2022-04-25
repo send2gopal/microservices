@@ -13,8 +13,7 @@ public class OAuthProviderConfig
         new ApiScope[]
         {
                 new ApiScope("basket", "Access to Basket API"),
-                new ApiScope("ordering", "Access to Ordering API"),
-                new ApiScope("shoppingaggr", "Access to Shopping Aggregator API")
+                new ApiScope("order", "Access to Ordering API"),
         };
 
     public static IEnumerable<ApiResource> ApiResources =>
@@ -25,13 +24,9 @@ public class OAuthProviderConfig
                     Scopes = { "basket" }
 
                 },
-                new ApiResource("ordering-api", "Ordering API")
+                new ApiResource("", "Order API")
                 {
-                    Scopes = { "ordering" }
-                },
-                new ApiResource("shoppingaggr-api", "Shopping Aggregator API")
-                {
-                    Scopes = { "shoppingaggr" }
+                    Scopes = { "order" }
                 }
         };
 
@@ -42,22 +37,22 @@ public class OAuthProviderConfig
                 new Client
                 {
                     ClientId = "angular-client",
-                    ClientName = "Angular Client App",
+                    ClientName = "Angular Client Development",
                     AllowedGrantTypes = GrantTypes.Code,
                     RequirePkce = true,
                     RequireClientSecret = false,
                     AllowAccessTokensViaBrowser = true,
                     RequireConsent = false,
 
-                    AllowedCorsOrigins = { configuration["BlazorClientUrlExternal"] },
+                    AllowedCorsOrigins = { configuration["FrontEndDev"], configuration["FrontEndProd"] },
 
                     // where to redirect to after login
-                    RedirectUris = { $"{configuration["BlazorClientUrlExternal"]}/signin-callback" },
+                    RedirectUris = { $"{configuration["FrontEndProd"]}/signin-callback" },
 
                     // where to redirect to after logout
                     PostLogoutRedirectUris =
                     {
-                        $"{configuration["BlazorClientUrlExternal"]}/signout-callback"
+                        $"{configuration["FrontEndProd"]}/signout-callback"
                     },
 
                     AllowedScopes =
@@ -65,8 +60,36 @@ public class OAuthProviderConfig
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         "basket",
-                        "ordering",
-                        "shoppingaggr"
+                        "order"
+                    },
+                },
+                new Client
+                {
+                    ClientId = "angular-client-local",
+                    ClientName = "Angular Client Local",
+                    AllowedGrantTypes = GrantTypes.Code,
+                    RequirePkce = true,
+                    RequireClientSecret = false,
+                    AllowAccessTokensViaBrowser = true,
+                    RequireConsent = false,
+
+                    AllowedCorsOrigins = { configuration["FrontEndDev"], configuration["FrontEndProd"] },
+
+                    // where to redirect to after login
+                    RedirectUris = { $"{configuration["FrontEndDev"]}/signin-callback" },
+
+                    // where to redirect to after logout
+                    PostLogoutRedirectUris =
+                    {
+                        $"{configuration["FrontEndDev"]}/signout-callback"
+                    },
+
+                    AllowedScopes =
+                    {
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Profile,
+                        "basket",
+                        "order"
                     },
                 },
                 new Client
@@ -96,23 +119,7 @@ public class OAuthProviderConfig
 
                     AllowedScopes =
                     {
-                        "ordering"
-                    }
-                },
-                new Client
-                {
-                    ClientId = "shoppingaggrswaggerui",
-                    ClientName = "Shopping Aggregator Swagger UI",
-                    AllowedGrantTypes = GrantTypes.Implicit,
-                    AllowAccessTokensViaBrowser = true,
-
-                    RedirectUris = { $"{configuration["ShoppingAggregatorApiUrlExternal"]}/swagger/oauth2-redirect.html" },
-                    PostLogoutRedirectUris = { $"{configuration["ShoppingAggregatorApiUrlExternal"]}/swagger/" },
-
-                    AllowedScopes =
-                    {
-                        "basket",
-                        "shoppingaggr"
+                        "order"
                     }
                 }
             };

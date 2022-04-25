@@ -93,12 +93,12 @@ public class AdminController : ControllerBase
             Category = productCatagory,
             Brand = brand,
             collection = model.collectionVal,
-            Variants = new List<ProductVariant> { 
+            Variants = new List<ProductVariant> {
                 new ProductVariant {
                     sku="sku1",
                     size="s",
                     color="White",
-                    
+
                 },
                 new ProductVariant {
                      sku="sku2",
@@ -120,34 +120,45 @@ public class AdminController : ControllerBase
 
     [HttpGet("products")]
     [ProducesResponseType(typeof(List<Product>), (int)HttpStatusCode.OK)]
-    public Task<List<ProductViewModel>> ProductsAsync()
+    public async Task<List<ProductViewModel>> ProductsAsync()
     {
 
-        var products = (from product in catalogDatabaseContext.Products
-                        join brand in catalogDatabaseContext.Brands on product.Brand.Id equals brand.Id
-                        join category in catalogDatabaseContext.ProductCatagories on product.Category.Id equals category.Id
-                        select new ProductViewModel
-                        {
-                            id = product.Id,
-                            title = product.Title,
-                            description = product.description,
-                            price = product.price,
-                            discount = product.discount,
-                            stock = product.stock,
-                            IsNew = product.IsNew,
-                            sale = product.sale,
-                            type = product.type,
-                            tags = product.tags.Split(",", System.StringSplitOptions.None),
-                            createdDate = product.CraetedDate,
-                            createdBy = product.CreatedBy,
-                            updatedBy = product.UpdatedBy,
-                            updatedDate = product.UpdatedDate,
-                            categoryName = category.Name,
-                            brand = brand.Name,
-                            collection = product.collection.Split(",", System.StringSplitOptions.None),
-                            images = product.Images,
-                            variants = product.Variants
-                        }).ToListAsync();
+        var products = await (from product in catalogDatabaseContext.Products
+                              join brand in catalogDatabaseContext.Brands on product.Brand.Id equals brand.Id
+                              join category in catalogDatabaseContext.ProductCatagories on product.Category.Id equals category.Id
+                              select new ProductViewModel
+                              {
+                                  id = product.Id,
+                                  title = product.Title,
+                                  description = product.description,
+                                  price = product.price,
+                                  discount = product.discount,
+                                  stock = product.stock,
+                                  IsNew = product.IsNew,
+                                  sale = product.sale,
+                                  type = product.type,
+                                  tags = product.tags.Split(",", System.StringSplitOptions.None),
+                                  createdDate = product.CraetedDate,
+                                  createdBy = product.CreatedBy,
+                                  updatedBy = product.UpdatedBy,
+                                  updatedDate = product.UpdatedDate,
+                                  categoryName = category.Name,
+                                  brand = brand.Name,
+                                  collection = product.collection.Split(",", System.StringSplitOptions.None),
+                                  images = product.Images.Select(x => new ProductImagesViewModel
+                                  {
+                                      image_id = x.Id,
+                                      alt = x.AltText,
+                                      src = x.Source
+                                  }),
+                                  variants = product.Variants.Select(x => new ProductVariantViewModel
+                                  {
+                                      variant_id = x.variant_id,
+                                      color = x.color,
+                                      size = x.size,
+                                      sku = x.sku
+                                  })
+                              }).ToListAsync();
 
 
 
@@ -187,38 +198,44 @@ public class AdminController : ControllerBase
 
     [HttpPost("MapProductImage")]
     [Consumes("multipart/form-data")]
-    public async Task<ActionResult<ProductImages>> UploadProdcutImageFile([FromForm] ImageModel model)
+    public async Task<ActionResult<ProductImagesViewModel>> UploadProdcutImageFile([FromForm] ImageModel model)
     {
         var product = catalogDatabaseContext.Products.Where(x => x.Id == model.productId).FirstOrDefault();
         if (product == null) return NotFound();
         var awsConfig = GetAwsConfig();
 
-        await UploadToS3(model.Image, awsConfig);
+        string s3FileName = $"{ await Nanoid.Nanoid.GenerateAsync(size: 10) }{ Path.GetExtension(model.Image.FileName)}";
 
-        string s3FileName = $"{ await Nanoid.Nanoid.GenerateAsync(size: 10) }.{ Path.GetExtension(model.Image.FileName)}";
+        await UploadToS3(model.Image, awsConfig, s3FileName);
+
 
         var productImage = new ProductImages
         {
 
-            src = string.Concat(awsConfig.S3Url, $"/{s3FileName}"),
+            Source = string.Concat(awsConfig.S3Url, $"/{s3FileName}"),
+            AltText = string.Concat("alt image"),
             CraetedDate = DateTime.Now,
             CreatedBy = "gthakur",
             UpdatedBy = "gthakur",
             UpdatedDate = DateTime.Now,
-            product = product
+            Product = product
         };
 
         var Prodctresult = await catalogDatabaseContext.ProductImages.AddAsync(productImage);
 
         await catalogDatabaseContext.SaveChangesAsync();
 
-        return Prodctresult.Entity;
+        return new ProductImagesViewModel {
+            image_id = Prodctresult.Entity.Id,
+            alt = Prodctresult.Entity.AltText,
+            src = Prodctresult.Entity.Source
+        } ;
     }
 
-    private async Task UploadToS3(IFormFile file, AwsConfigOptions awsConfig)
+    private async Task UploadToS3(IFormFile file, AwsConfigOptions awsConfig, string filename)
     {
         //for this example, try giving S3 full permissions
-        using (var client = new AmazonS3Client(awsConfig.Accesskey, awsConfig.Secret, RegionEndpoint.USWest1))
+        using (var client = new AmazonS3Client(awsConfig.Accesskey, awsConfig.Secret, RegionEndpoint.USEast1))
         {
             using (var newMemoryStream = new MemoryStream())
             {
@@ -227,8 +244,8 @@ public class AdminController : ControllerBase
                 var uploadRequest = new TransferUtilityUploadRequest
                 {
                     InputStream = newMemoryStream,
-                    Key = file.FileName, // filename
-                    BucketName = "microkart" 
+                    Key = filename, // filename
+                    BucketName = "microkart"
                 };
 
                 var fileTransferUtility = new TransferUtility(client);

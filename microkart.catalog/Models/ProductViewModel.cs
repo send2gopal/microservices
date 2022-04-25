@@ -43,8 +43,8 @@ namespace microkart.catalog.Models
         
         public string imagesrc { get; set; }="";
 
-        public List<ProductImages>? images { get; set; }
-        public List<ProductVariant>? variants { get; set; }
+        public IEnumerable<ProductImagesViewModel> images { get; set; } = new List<ProductImagesViewModel>();
+        public IEnumerable<ProductVariantViewModel> variants { get; set; } = new List<ProductVariantViewModel>();
         public string[]? tags { get; set; }
         public string[]? collection { get; set; }
 
