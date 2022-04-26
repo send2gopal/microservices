@@ -1,14 +1,9 @@
-using Dapr.Client;
-using microkart.basket.Database;
+using microkart.order.Database;
 using Microsoft.EntityFrameworkCore;
-using System.IdentityModel.Tokens.Jwt;
-using static microkart.shared.Constants.Dapr;
-using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
-namespace Microkart.basket;
+namespace microkart.Order;
 public static class StartupExtensions
 {
     public const string AppName = "Order Service";
@@ -34,7 +29,7 @@ public static class StartupExtensions
 
         Console.WriteLine($"ConnectionString: {defaultConnectionString}");
 
-        builder.Services.AddDbContext<BasketDatabaseContext>(
+        builder.Services.AddDbContext<OrderDatabaseContext>(
                    options => options.UseSqlServer(defaultConnectionString));
     }
 

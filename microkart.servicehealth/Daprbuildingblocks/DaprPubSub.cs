@@ -13,7 +13,7 @@ namespace microkart.shared.Daprbuildingblocks
     public class DaprEventBus : IEventBus
     {
 
-        private const string PUBSUB_NAME = "pubsub";
+        public const string PUBSUB_NAME = "pubsub";
 
         private readonly DaprClient _dapr;
         private readonly ILogger _logger;

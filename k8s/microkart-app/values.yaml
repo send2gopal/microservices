@@ -4,36 +4,41 @@ database:
   dbserver: identity-db
 website:
   image: "microkart-frontend"
-  tag:  "v1"
+  tag:  "latest"
   name: "microkart-frontend"
   port: 7000
 gateway:
   image: "microkart-gateway"
-  tag:  "v1"
+  tag:  "latest"
   name: "microkart-gateway"
   port: 7001
 identity:
   image: "microkart-identity"
-  tag:  "v1"
+  tag:  "latest"
   name: "microkart-identity"
   port: 7002
 catalog:
   image: "microkart-catalog"
-  tag:  "v1"
+  tag:  "latest"
   name: "microkart-catalog"
   port: 7003
 basket:
   image: "microkart-basket"
-  tag:  "v1"
+  tag:  "latest"
   name: "microkart-basket"
   port: 7004
 order:
   image: "microkart-order"
-  tag:  "v1"
+  tag:  "latest"
   name: "microkart-order"
   port: 7005
 payment:
   image: "microkart-payment"
-  tag:  "v1"
+  tag:  "latest"
   name: "microkart-payment"
+  port: 7006
+notification:
+  image: "microkart-notification"
+  tag:  "latest"
+  name: "microkart-notification"
   port: 7006

@@ -7,6 +7,8 @@ namespace microkart.basket.Database
         string City,
         string Street,
         string State,
+        string ZipCode,
+        string AptOrUnit,
         string Country,
         string CardNumber,
         string CardHolderName,

@@ -24,7 +24,7 @@ public class OAuthProviderConfig
                     Scopes = { "basket" }
 
                 },
-                new ApiResource("", "Order API")
+                new ApiResource("order-api", "Order API")
                 {
                     Scopes = { "order" }
                 }

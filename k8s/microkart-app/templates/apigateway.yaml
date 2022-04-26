@@ -24,9 +24,9 @@ data:
               codec_type: auto
               stat_prefix: ingress_http
               route_config:
-                name: eshop_backend_route
+                name: microkart_backend_route
                 virtual_hosts:
-                - name: eshop_backend
+                - name: microkart_backend
                   domains:
                   - "*"
                   cors:
@@ -35,26 +35,12 @@ data:
                         google_re2: {}
                         regex: \*
                     allow_methods: "GET, POST, PUT"
-                    allow_headers: "authorization, content-type, x-requestid, x-requested-with, x-signalr-user-agent"
+                    allow_headers: "authorization, content-type, x-requestid, x-requested-with, x-signalr-user-agent, x-correlation-id"
                     allow_credentials: true
                   routes:
-                  - name: "pics"
-                    match:
-                      prefix: "/c/pics/"
-                    route:
-                      auto_host_rewrite: true
-                      prefix_rewrite: "/pics/"
-                      cluster: catalog
                   - name: "c-short"
                     match:
                       prefix: "/c/"
-                    route:
-                      auto_host_rewrite: true
-                      prefix_rewrite: "/v1.0/invoke/microkart-catalog/method/"
-                      cluster: dapr
-                  - name: "c-long"
-                    match:
-                      prefix: "/catalog-api/"
                     route:
                       auto_host_rewrite: true
                       prefix_rewrite: "/v1.0/invoke/microkart-catalog/method/"
@@ -71,42 +57,14 @@ data:
                       prefix: "/o/"
                     route:
                       auto_host_rewrite: true
-                      prefix_rewrite: "/v1.0/invoke/ordering-api/method/"
+                      prefix_rewrite: "/v1.0/invoke/microkart-order/method/"
                       cluster: dapr
-                  - name: "o-long"
-                    match:
-                      prefix: "/ordering-api/"
-                    route:
-                      auto_host_rewrite: true
-                      prefix_rewrite: "/v1.0/invoke/ordering-api/method/"
-                      cluster: dapr
-                  - name: "h-long"
-                    match:
-                      prefix: "/hub/notificationhub"
-                    route:
-                      auto_host_rewrite: true
-                      cluster: ordering-api
-                      timeout: 300s
                   - name: "b-short"
                     match:
                       prefix: "/b/"
                     route:
                       auto_host_rewrite: true
                       prefix_rewrite: "/v1.0/invoke/microkart-basket/method/"
-                      cluster: dapr
-                  - name: "b-long"
-                    match:
-                      prefix: "/basket/"
-                    route:
-                      auto_host_rewrite: true
-                      prefix_rewrite: "/v1.0/invoke/microkart-basket/method/"
-                      cluster: dapr
-                  - name: "agg"
-                    match:
-                      prefix: "/"
-                    route:
-                      auto_host_rewrite: true
-                      prefix_rewrite: "/v1.0/invoke/webshoppingagg/method/"
                       cluster: dapr
               http_filters:
               - name: envoy.cors
@@ -138,23 +96,6 @@ data:
         - socket_address:
             address: 127.0.0.1
             port_value: 3500
-      - name: catalog
-        connect_timeout: 0.25s
-        type: strict_dns
-        lb_policy: round_robin
-        hosts:
-        - socket_address:
-            address: microkart-catalog
-            port_value: 80
-      - name: ordering-api
-        connect_timeout: 0.25s
-        type: strict_dns
-        lb_policy: round_robin
-        hosts:
-        - socket_address:
-            address: ordering-api
-            port_value: 80
-
 ---
 
 kind: Deployment

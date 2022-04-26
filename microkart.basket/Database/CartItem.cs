@@ -23,6 +23,6 @@ namespace microkart.basket.Database
         [Required]
         public string ProductImageUrl { get; set; } = "";
 
-        public virtual Cart Cart { get; set; } = new Cart();
+        public virtual Cart Cart { get; set; }
     }
 }

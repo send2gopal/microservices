@@ -1,6 +1,7 @@
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { from, Observable } from 'rxjs';
+import { Guid } from 'guid-typescript';
 import { AuthService } from './auth.service';
 import {environment} from '../../../environments/environment'
 
@@ -16,7 +17,8 @@ export class AuthInterceptorService implements HttpInterceptor {
       return from(
         this._authService.getAccessToken()
         .then(token => {
-          const headers = req.headers.set('Authorization', `Bearer ${token}`);
+          var headers = req.headers.set('Authorization', `Bearer ${token}`)
+          .set('x-correlation-id', `${Guid.create()}`);
           const authRequest = req.clone({ headers });
           return next.handle(authRequest).toPromise();
         })

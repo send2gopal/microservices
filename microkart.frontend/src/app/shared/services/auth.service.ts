@@ -17,7 +17,7 @@ export class AuthService {
       authority: environment.idpAuthority,
       client_id: environment.clientId,
       redirect_uri: `${environment.clientRoot}/signin-callback`,
-      scope: "openid profile basket ordering shoppingaggr",
+      scope: "openid profile basket order",
       response_type: "code",
       post_logout_redirect_uri: `${environment.clientRoot}/signout-callback`
     }

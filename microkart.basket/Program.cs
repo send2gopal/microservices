@@ -1,4 +1,5 @@
 
+using microkart.basket;
 using microkart.servicehealth;
 using microkart.shared.Abstraction;
 using microkart.shared.Daprbuildingblocks;
@@ -35,7 +36,7 @@ var app = builder.Build();
 
 
 app.MapHealthChecks("/health");
-
+app.UseMiddleware<LogHeaderMiddleware>();
 // global cors policy
 app.UseCors(x => x
     .AllowAnyMethod()
@@ -53,6 +54,7 @@ app.UseCloudEvents();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapSubscribeHandler();
 
 
 
