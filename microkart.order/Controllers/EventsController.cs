@@ -56,7 +56,7 @@ namespace microkart.order.Controllers
 
                     ShippingAddress = new ShippingAddress
                     {
-
+                        UserId = integrationEvent.UserId,
                         AptOrUnit = integrationEvent.AptOrUnit,
                         City = integrationEvent.City,
                         Country = integrationEvent.Country,
@@ -148,32 +148,6 @@ namespace microkart.order.Controllers
                     //    );
                     //await _eventBus.PublishAsync(orderConfirmationNotification);
                     _logger.LogWarning("Order Shipped - {@IntegrationEvent}", integrationEvent);
-                }
-                else if (integrationEvent.Status == OrderStatus.Cancelled.Id)
-                {
-                    var inventoryRollbackPubSubEvent = new OrderCancelledPubSubEvent(
-                        order.UserId,
-                        order.Id,
-                        order.Enail,
-                        order.PaymentInformation.CardNumber,
-                        order.PaymentInformation.CardHolderName,
-                        order.PaymentInformation.CardExpiration,
-                        order.PaymentInformation.CardSecurityNumber,
-                        order.PaymentInformation.Amount,
-                        order.PaymentInformation.PaymentReferenceNumber,
-                        integrationEvent.CorrelationId,
-                        new CartRequest
-                        {
-                            Items = order.Items.Select(c => new CartRequestItem
-                            {
-                                ProductId = c.ProductId,
-                                ProductName = c.ProductName,
-                                UnitPrice = c.UnitPrice,
-                                Quantity = c.Quantity,
-                                ProductImageUrl = c.ProductImageUrl
-                            }).ToList()
-                        });
-                    await _eventBus.PublishAsync(inventoryRollbackPubSubEvent);
                 }
                 order.OrderStatus = integrationEvent.Status;
 

@@ -8,6 +8,7 @@ namespace microkart.order.Database
 
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
         public DbSet<ShippingAddress> ShippingAddresses => Set<ShippingAddress>();
+        public DbSet<PaymentInformation> PaymentInformations => Set<PaymentInformation>();
 
         public OrderDatabaseContext(DbContextOptions<OrderDatabaseContext> options)
             : base(options)
