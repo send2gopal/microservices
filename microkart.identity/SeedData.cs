@@ -1,145 +1,121 @@
-﻿using IdentityModel;
-using IdentityServer4.EntityFramework.DbContexts;
-using IdentityServer4.EntityFramework.Mappers;
-using IdentityServer4.EntityFramework.Storage;
-using microkart.identity.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
-using static microkart.identity.SeedConfig;
+﻿namespace microkart.identity.Services.Identity.API;
 
-namespace microkart.identity
+public class SeedData
 {
-    public class SeedData
+    public static async Task EnsureSeedData(IServiceScope scope, IConfiguration configuration, ILogger logger)
     {
-        public static void EnsureSeedData(string connectionString)
+        var retryPolicy = CreateRetryPolicy(configuration, logger);
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        await retryPolicy.ExecuteAsync(async () =>
         {
-            var services = new ServiceCollection();
-            services.AddLogging();
-            services.AddDbContext<MicrokartIdentityDbContext>(
-                options => options.UseSqlServer(connectionString)
-            );
+            await context.Database.MigrateAsync();
 
-            services
-                .AddIdentity<IdentityUser, IdentityRole>()
-                .AddEntityFrameworkStores<MicrokartIdentityDbContext>()
-                .AddDefaultTokenProviders();
+            var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var alice = await userMgr.FindByNameAsync("gthakur");
 
-            services.AddOperationalDbContext(
-                options =>
-                {
-                    options.ConfigureDbContext = db =>
-                        db.UseSqlServer(
-                            connectionString,
-                            sql => sql.MigrationsAssembly(typeof(SeedData).Assembly.FullName)
-                        );
-                }
-            );
-            services.AddConfigurationDbContext(
-                options =>
-                {
-                    options.ConfigureDbContext = db =>
-                        db.UseSqlServer(
-                            connectionString,
-                            sql => sql.MigrationsAssembly(typeof(SeedData).Assembly.FullName)
-                        );
-                }
-            );
-
-            var serviceProvider = services.BuildServiceProvider();
-
-            using var scope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope();
-            scope.ServiceProvider?.GetService<PersistedGrantDbContext>()?.Database.Migrate();
-
-            var context = scope.ServiceProvider?.GetService<ConfigurationDbContext>();
-            context?.Database.Migrate();
-
-            EnsureSeedData(context);
-
-            var ctx = scope.ServiceProvider?.GetService<MicrokartIdentityDbContext>();
-            ctx?.Database.Migrate();
-            EnsureUsers(scope);
-        }
-
-        private static void EnsureUsers(IServiceScope scope)
-        {
-            var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-
-            var angella = userMgr.FindByNameAsync("angella").Result;
-            if (angella == null)
+            if (alice == null)
             {
-                angella = new IdentityUser
+                alice = new ApplicationUser
                 {
-                    UserName = "angella",
-                    Email = "angella.freeman@email.com",
-                    EmailConfirmed = true
+                    UserName = "gthakur",
+                    Email = "gopal.thakur@montclair.edu",
+                    EmailConfirmed = true,
+                    CardHolderName = "Gopal Thakur",
+                    CardNumber = "4258965963256986",
+                    CardType = 1,
+                    City = "Clifton",
+                    Country = "US",
+                    Expiration = "01/26",
+                    Id = Guid.NewGuid().ToString(),
+                    LastName = "Thakur",
+                    Name = "Gopal",
+                    PhoneNumber = "9586535896",
+                    ZipCode = "08968",
+                    State = "NJ",
+                    Street = "19 Richland CT",
+                    SecurityNumber = "123"
                 };
-                var result = userMgr.CreateAsync(angella, "Pass123$").Result;
+
+                var result = userMgr.CreateAsync(alice, "India123$").Result;
+
                 if (!result.Succeeded)
                 {
                     throw new Exception(result.Errors.First().Description);
                 }
 
-                result =
-                    userMgr.AddClaimsAsync(
-                        angella,
-                        new Claim[]
-                        {
-                            new Claim(JwtClaimTypes.Name, "Angella Freeman"),
-                            new Claim(JwtClaimTypes.GivenName, "Angella"),
-                            new Claim(JwtClaimTypes.FamilyName, "Freeman"),
-                            new Claim(JwtClaimTypes.WebSite, "http://angellafreeman.com"),
-                            new Claim("location", "somewhere")
-                        }
-                    ).Result;
-                if (!result.Succeeded)
-                {
-                    throw new Exception(result.Errors.First().Description);
-                }
+                logger.LogDebug("gthakur created");
             }
-        }
+            else
+            {
+                logger.LogDebug("gthakur already exists");
+            }
 
-        private static void EnsureSeedData(ConfigurationDbContext context)
+            var bob = await userMgr.FindByNameAsync("someuser");
+
+            if (bob == null)
+            {
+                bob = new ApplicationUser
+                {
+                    UserName = "someuser",
+                    Email = "someuser@email.com",
+                    EmailConfirmed = true,
+                    CardHolderName = "Some User",
+                    CardNumber = "4587968569863269",
+                    CardType = 1,
+                    City = "Montclair",
+                    Country = "UA",
+                    Expiration = "01/26",
+                    Id = Guid.NewGuid().ToString(),
+                    LastName = "Some",
+                    Name = "User",
+                    PhoneNumber = "5698659638",
+                    ZipCode = "25396",
+                    State = "NJ",
+                    Street = "7 Richland CT",
+                    SecurityNumber = "128"
+                };
+
+                var result = await userMgr.CreateAsync(bob, "India123$");
+
+                if (!result.Succeeded)
+                {
+                    throw new Exception(result.Errors.First().Description);
+                }
+
+                logger.LogDebug("someuser created");
+            }
+            else
+            {
+                logger.LogDebug("someuser already exists");
+            }
+        });
+    }
+
+    private static AsyncPolicy CreateRetryPolicy(IConfiguration configuration, ILogger logger)
+    {
+        var retryMigrations = false;
+        bool.TryParse(configuration["RetryMigrations"], out retryMigrations);
+
+        // Only use a retry policy if configured to do so.
+        // When running in an orchestrator/K8s, it will take care of restarting failed services.
+        if (retryMigrations)
         {
-            if (!context.Clients.Any())
-            {
-                foreach (var client in Clients.ToList())
-                {
-                    context.Clients.Add(client.ToEntity());
-                }
-
-                context.SaveChanges();
-            }
-
-            if (!context.IdentityResources.Any())
-            {
-                foreach (var resource in IdentityResources.ToList())
-                {
-                    context.IdentityResources.Add(resource.ToEntity());
-                }
-
-                context.SaveChanges();
-            }
-
-            if (!context.ApiScopes.Any())
-            {
-                foreach (var resource in ApiScopes.ToList())
-                {
-                    context.ApiScopes.Add(resource.ToEntity());
-                }
-
-                context.SaveChanges();
-            }
-
-            if (!context.ApiResources.Any())
-            {
-                foreach (var resource in ApiResources.ToList())
-                {
-                    context.ApiResources.Add(resource.ToEntity());
-                }
-
-                context.SaveChanges();
-            }
+            return Policy.Handle<Exception>().
+                WaitAndRetryForeverAsync(
+                    sleepDurationProvider: retry => TimeSpan.FromSeconds(5),
+                    onRetry: (exception, retry, timeSpan) =>
+                    {
+                        logger.LogWarning(
+                            exception,
+                            "Exception {ExceptionType} with message {Message} detected during database migration (retry attempt {retry})",
+                            exception.GetType().Name,
+                            exception.Message,
+                            retry);
+                    }
+                );
         }
+
+        return Policy.NoOpAsync();
     }
 }

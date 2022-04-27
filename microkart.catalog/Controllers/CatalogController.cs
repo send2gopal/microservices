@@ -82,7 +82,7 @@ public class CatalogController : ControllerBase
             .LongCountAsync();
 
         var itemsOnPage = await query
-            .OrderBy(item => item.Name)
+            .OrderBy(item => item.Title)
             .Skip(pageSize * pageIndex)
             .Take(pageSize)
             .ToListAsync();

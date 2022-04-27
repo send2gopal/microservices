@@ -11,13 +11,12 @@ COPY ["microkart.identity/microkart.identity.csproj", "microkart.identity/"]
 RUN dotnet restore "microkart.identity/microkart.identity.csproj"
 COPY . .
 WORKDIR "/src/microkart.identity"
-RUN dotnet build "microkart.identity.csproj" -c Release -o /app/build
+RUN dotnet build "microkart.identity.csproj" -c Debug -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "microkart.identity.csproj" -c Release -o /app/publish
+RUN dotnet publish "microkart.identity.csproj" -c Debug -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-EXPOSE 80
 ENTRYPOINT ["dotnet", "microkart.identity.dll"]

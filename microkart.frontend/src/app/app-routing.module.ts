@@ -4,8 +4,13 @@ import { Routes, RouterModule } from '@angular/router';
 import { ShopComponent } from './shop/shop.component';
 import { PagesComponent } from './pages/pages.component';
 import { ElementsComponent } from './elements/elements.component';
+import { SigninRedirectCallbackComponent } from './signin-redirect-callback/signin-redirect-callback.component';
+import { SignoutRedirectCallbackComponent } from './signout-redirect-callback/signout-redirect-callback.component';
+import { AuthGuard } from './shared/auth.guard';
 
 const routes: Routes = [
+  { path: 'signin-callback', component: SigninRedirectCallbackComponent },
+  { path: 'signout-callback', component: SignoutRedirectCallbackComponent },
   {
     path: '',
     redirectTo: 'home/electronics',
@@ -23,6 +28,7 @@ const routes: Routes = [
   { 
     path: 'pages',
     component: PagesComponent,
+    canActivate: [AuthGuard],
     loadChildren: () => import('./pages/pages.module').then(m => m.PagesModule) 
   },
   { 
@@ -33,6 +39,7 @@ const routes: Routes = [
     path: '**', // Navigate to Home Page if not found any page
     redirectTo: 'pages/404',
   },
+  
 ];
 
 @NgModule({

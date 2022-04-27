@@ -17,7 +17,7 @@ namespace microkart.catalog.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.3")
+                .HasAnnotation("ProductVersion", "6.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -43,7 +43,8 @@ namespace microkart.catalog.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Logo")
                         .IsRequired()
@@ -51,7 +52,8 @@ namespace microkart.catalog.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("UpdatedBy")
                         .IsRequired()
@@ -76,6 +78,9 @@ namespace microkart.catalog.Migrations
                     b.Property<int>("BrandId")
                         .HasColumnType("int");
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CraetedDate")
                         .HasColumnType("datetime2");
 
@@ -83,34 +88,13 @@ namespace microkart.catalog.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("Discount")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
+                    b.Property<bool>("IsNew")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Pitchures")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ProductCatagoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuantityInStock")
-                        .HasColumnType("int");
 
                     b.Property<string>("UpdatedBy")
                         .IsRequired()
@@ -119,11 +103,43 @@ namespace microkart.catalog.Migrations
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("collection")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("discount")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("product_Id")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("sale")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("stock")
+                        .HasColumnType("int");
+
+                    b.Property<string>("tags")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BrandId");
 
-                    b.HasIndex("ProductCatagoryId");
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("Products");
                 });
@@ -160,6 +176,82 @@ namespace microkart.catalog.Migrations
                     b.ToTable("ProductCatagories");
                 });
 
+            modelBuilder.Entity("microkart.catalog.Database.ProductImages", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("AltText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CraetedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductVariantvariant_id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ProductVariantvariant_id");
+
+                    b.ToTable("ProductImages");
+                });
+
+            modelBuilder.Entity("microkart.catalog.Database.ProductVariant", b =>
+                {
+                    b.Property<string>("variant_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("color")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("productId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("size")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("sku")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("variant_id");
+
+                    b.HasIndex("productId");
+
+                    b.ToTable("ProductVariant");
+                });
+
             modelBuilder.Entity("microkart.catalog.Database.Product", b =>
                 {
                     b.HasOne("microkart.catalog.Database.Brand", "Brand")
@@ -168,15 +260,53 @@ namespace microkart.catalog.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("microkart.catalog.Database.ProductCatagory", "ProductCatagory")
+                    b.HasOne("microkart.catalog.Database.ProductCatagory", "Category")
                         .WithMany()
-                        .HasForeignKey("ProductCatagoryId")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Brand");
 
-                    b.Navigation("ProductCatagory");
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("microkart.catalog.Database.ProductImages", b =>
+                {
+                    b.HasOne("microkart.catalog.Database.Product", "Product")
+                        .WithMany("Images")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("microkart.catalog.Database.ProductVariant", null)
+                        .WithMany("productImages")
+                        .HasForeignKey("ProductVariantvariant_id");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("microkart.catalog.Database.ProductVariant", b =>
+                {
+                    b.HasOne("microkart.catalog.Database.Product", "product")
+                        .WithMany("Variants")
+                        .HasForeignKey("productId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("product");
+                });
+
+            modelBuilder.Entity("microkart.catalog.Database.Product", b =>
+                {
+                    b.Navigation("Images");
+
+                    b.Navigation("Variants");
+                });
+
+            modelBuilder.Entity("microkart.catalog.Database.ProductVariant", b =>
+                {
+                    b.Navigation("productImages");
                 });
 #pragma warning restore 612, 618
         }

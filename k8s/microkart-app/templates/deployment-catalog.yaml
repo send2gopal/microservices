@@ -27,3 +27,19 @@ spec:
         imagePullPolicy: Never
         ports:
         - containerPort: 80
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Test"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.catalog.name}}
+  namespace: {{.Values.namespace}}
+spec:
+  selector:
+    app: {{.Values.catalog.name}}
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

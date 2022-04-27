@@ -12,10 +12,10 @@ COPY ["microkart.servicehealth/microkart.shared.csproj", "microkart.shared/"]
 RUN dotnet restore "microkart.catalog/microkart.catalog.csproj"
 COPY . .
 WORKDIR "/src/microkart.catalog"
-RUN dotnet build "microkart.catalog.csproj" -c Release -o /app/build
+RUN dotnet build "microkart.catalog.csproj" -c Debug -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "microkart.catalog.csproj" -c Release -o /app/publish
+RUN dotnet publish "microkart.catalog.csproj" -c Debug -o /app/publish
 
 FROM base AS final
 WORKDIR /app

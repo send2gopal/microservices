@@ -60,6 +60,7 @@ export class CollectionLeftSidebarComponent implements OnInit {
   }
 
   ngOnInit(): void {
+   
   }
 
 

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { User } from 'oidc-client';
+import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -8,10 +10,14 @@ import { Component, OnInit } from '@angular/core';
 export class DashboardComponent implements OnInit {
 
   public openDashboard: boolean = false;
-
-  constructor() { }
+  public user : User;
+  constructor(public _authService: AuthService) {}
 
   ngOnInit(): void {
+    this._authService.getUserAsync()
+        .then(u => {
+          this.user = u;
+        });
   }
 
   ToggleDashboard() {

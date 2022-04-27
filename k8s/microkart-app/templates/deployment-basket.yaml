@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.basket.name}}
+  labels:
+    app: {{.Values.basket.name}}
+  namespace: {{.Values.namespace}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{.Values.basket.name}}
+  template:
+    metadata:
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "{{.Values.basket.name}}"
+        dapr.io/app-port: "80"
+        dapr.io/log-as-json: "true"
+        dapr.io/config: "dapr-config"
+      labels:
+        app: {{.Values.basket.name}}
+    spec:
+      containers:
+      - name: {{.Values.basket.name}}
+        image: {{.Values.basket.image}}:{{.Values.basket.tag}}
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Test"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.basket.name}}
+  namespace: {{.Values.namespace}}
+spec:
+  selector:
+    app: {{.Values.basket.name}}
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

@@ -3,10 +3,15 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
+
   production: false,
   instagram_token: 'INSTA_TOKEN',
   stripe_token: 'STRIPE_TOKEN',
-  paypal_token: 'PAYPAL_TOKEN'
+  paypal_token: 'PAYPAL_TOKEN',
+  apiRoot : "http://localhost:7001",
+  clientRoot : "http://localhost:4200",
+  idpAuthority : "http://localhost:7002",
+  clientId : "angular-client-local"
 };
 
 /*

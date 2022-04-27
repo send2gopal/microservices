@@ -1,11 +1,12 @@
 using Dapr.Client;
 using microkart.catalog.Database;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using static microkart.shared.Constants.Dapr;
 
 public static class StartupExtensions
 {
-    private const string AppName = "Catalog API";
+    public const string AppName = "Catalog Service";
 
     public static async Task AddDbContextAsync(this WebApplicationBuilder builder)
     {
@@ -52,5 +53,19 @@ public static class StartupExtensions
                 policy.RequireClaim("scope", "ordering");
             });
         });
+    }
+
+    public static void AddSerilog(this WebApplicationBuilder builder)
+    {
+        var seqServerUrl = builder.Configuration["SeqServerUrl"];
+        Console.WriteLine($"seqServerUrl: {seqServerUrl}");
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(builder.Configuration)
+            .WriteTo.Console()
+            .WriteTo.Seq(seqServerUrl)
+            .Enrich.WithProperty("ApplicationName", AppName)
+            .CreateLogger();
+
+        builder.Host.UseSerilog();
     }
 }

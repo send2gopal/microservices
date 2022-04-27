@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.payment.name}}
+  labels:
+    app: {{.Values.payment.name}}
+  namespace: {{.Values.namespace}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{.Values.payment.name}}
+  template:
+    metadata:
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "{{.Values.payment.name}}"
+        dapr.io/app-port: "80"
+        dapr.io/log-as-json: "true"
+        dapr.io/config: "dapr-config"
+      labels:
+        app: {{.Values.payment.name}}
+    spec:
+      containers:
+      - name: {{.Values.payment.name}}
+        image: {{.Values.payment.image}}:{{.Values.payment.tag}}
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Test"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.payment.name}}
+  namespace: {{.Values.namespace}}
+spec:
+  selector:
+    app: {{.Values.payment.name}}
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
