@@ -13,7 +13,7 @@ export class AuthInterceptorService implements HttpInterceptor {
   constructor(private _authService: AuthService) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if(req.url.startsWith(environment.apiRoot)){
+    if(req.url.toLowerCase().includes('api')){
       return from(
         this._authService.getAccessToken()
         .then(token => {

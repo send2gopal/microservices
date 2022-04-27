@@ -2,6 +2,7 @@
 {
     public class OrderResponse
     {
+        public int Id { get; set; }
         public Guid UserId { get; set; }
         public OrderStatus OrderStatus { get; set; } = OrderStatus.New;
         public string Enail { get; set; } = string.Empty;

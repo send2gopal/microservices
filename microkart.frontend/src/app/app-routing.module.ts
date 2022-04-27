@@ -6,6 +6,7 @@ import { PagesComponent } from './pages/pages.component';
 import { ElementsComponent } from './elements/elements.component';
 import { SigninRedirectCallbackComponent } from './signin-redirect-callback/signin-redirect-callback.component';
 import { SignoutRedirectCallbackComponent } from './signout-redirect-callback/signout-redirect-callback.component';
+import { AuthGuard } from './shared/auth.guard';
 
 const routes: Routes = [
   { path: 'signin-callback', component: SigninRedirectCallbackComponent },
@@ -27,6 +28,7 @@ const routes: Routes = [
   { 
     path: 'pages',
     component: PagesComponent,
+    canActivate: [AuthGuard],
     loadChildren: () => import('./pages/pages.module').then(m => m.PagesModule) 
   },
   { 

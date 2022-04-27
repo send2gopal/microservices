@@ -10,7 +10,7 @@
 
  docker build -f microkart.notification/Dockerfile -t microkart-notification:latest .
 
- #docker build  -t microkart-frontend:latest -f microkart.frontend/Dockerfile . --progress=plain --no-cache
+ docker build  -t microkart-frontend:latest -f microkart.frontend/Dockerfile . --progress=plain --no-cache
 
  helm uninstall  microkart-app --wait
 

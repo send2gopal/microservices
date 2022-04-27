@@ -23,13 +23,8 @@
               <a (click)="login()"><i class="fa fa-sign-in" aria-hidden="true"></i>Login</a>
             </li>
             <li *ngIf="isUserAuthenticated" class="onhover-dropdown mobile-account">
-              <i class="fa fa-user" aria-hidden="true"></i> My Account
+              <i class="fa fa-user" [routerLink]="['/pages/dashboard']" aria-hidden="true"></i>
               <ul class="onhover-show-div">
-                <li>
-                  <a data-lng="en" (click)="login()">
-                    Orders
-                  </a>
-                </li>
                 <li>
                   <a data-lng="es" (click)="logout()">
                     Logout

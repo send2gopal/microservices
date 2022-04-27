@@ -72,4 +72,11 @@ export class AuthService {
     })
   }
 
+  public getUserAsync = (): Promise<User> => {
+    return this._userManager.getUser()
+      .then(user => {
+         return !!user && !user.expired ? user : null;
+    });
+  }
+
 }
