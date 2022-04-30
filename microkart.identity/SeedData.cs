@@ -12,11 +12,11 @@ public class SeedData
             await context.Database.MigrateAsync();
 
             var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            var alice = await userMgr.FindByNameAsync("gthakur");
+            var gthakur = await userMgr.FindByNameAsync("gthakur");
 
-            if (alice == null)
+            if (gthakur == null)
             {
-                alice = new ApplicationUser
+                gthakur = new ApplicationUser
                 {
                     UserName = "gthakur",
                     Email = "gopal.thakur@montclair.edu",
@@ -37,7 +37,7 @@ public class SeedData
                     SecurityNumber = "123"
                 };
 
-                var result = userMgr.CreateAsync(alice, "India123$").Result;
+                var result = userMgr.CreateAsync(gthakur, "India123$").Result;
 
                 if (!result.Succeeded)
                 {
@@ -51,11 +51,11 @@ public class SeedData
                 logger.LogDebug("gthakur already exists");
             }
 
-            var bob = await userMgr.FindByNameAsync("someuser");
+            var someuser = await userMgr.FindByNameAsync("someuser");
 
-            if (bob == null)
+            if (someuser == null)
             {
-                bob = new ApplicationUser
+                someuser = new ApplicationUser
                 {
                     UserName = "someuser",
                     Email = "someuser@email.com",
@@ -76,7 +76,7 @@ public class SeedData
                     SecurityNumber = "128"
                 };
 
-                var result = await userMgr.CreateAsync(bob, "India123$");
+                var result = await userMgr.CreateAsync(someuser, "India123$");
 
                 if (!result.Succeeded)
                 {

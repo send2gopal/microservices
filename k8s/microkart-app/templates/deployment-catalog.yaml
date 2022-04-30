@@ -24,6 +24,22 @@ spec:
       containers:
       - name: {{.Values.catalog.name}}
         image: {{.Values.catalog.image}}:{{.Values.catalog.tag}}
+        resources:
+          requests:
+            memory: 64Mi
+            cpu: 250m
+        livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 3
+        readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 3
         imagePullPolicy: Never
         ports:
         - containerPort: 80
