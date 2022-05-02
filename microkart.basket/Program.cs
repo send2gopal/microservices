@@ -45,7 +45,7 @@ app.UseCors(x => x
     .AllowCredentials()); // allow credentials
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+//if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();

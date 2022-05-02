@@ -1,8 +1,6 @@
 using Dapr;
-using microkart.shared.Abstraction;
 using microkart.shared.Daprbuildingblocks;
 using microkart.shared.Events;
-using microkart.shared.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace microkart.payment.Controllers
@@ -48,6 +46,7 @@ namespace microkart.payment.Controllers
         }
 
         [Topic(DaprEventBus.PUBSUB_NAME, "OrderShippedNotificationEvent")]
+        [HttpPost("OrderShipped")]
         public void OrderShipped(OrderConfirmationNotificationEvent integrationEvent)
         {
             if (integrationEvent.CorrelationId != Guid.Empty)
@@ -60,8 +59,23 @@ namespace microkart.payment.Controllers
             }
         }
 
+        [HttpPost("OrderDelivered")]
         [Topic(DaprEventBus.PUBSUB_NAME, "OrderDeliveredShippedNotificationEvent")]
         public void OrderDelivered(OrderConfirmationNotificationEvent integrationEvent)
+        {
+            if (integrationEvent.CorrelationId != Guid.Empty)
+            {
+                _logger.LogWarning("Received OrderConfirmationNotificationEvent event {@IntegrationEvent}", integrationEvent);
+            }
+            else
+            {
+                _logger.LogWarning("Invalid IntegrationEvent - RequestId is missing - {@IntegrationEvent}", integrationEvent);
+            }
+        }
+
+        [HttpPost("SendInvoice")]
+        [Topic(DaprEventBus.PUBSUB_NAME, "OrderDeliveredShippedNotificationEvent")]
+        public void SendInvoice(OrderConfirmationNotificationEvent integrationEvent)
         {
             if (integrationEvent.CorrelationId != Guid.Empty)
             {
