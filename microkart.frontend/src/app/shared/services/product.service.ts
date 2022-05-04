@@ -78,7 +78,7 @@ export class ProductService {
     console.log("Placing Order");
     this.http.post(environment.apiRoot +"/b/api/Basket/checkout", body).subscribe((r)=> {
       var item = {
-        shippingDetails: null,
+        shippingDetails: {},
         product: state.cart,
         //orderId: orderId,
         totalAmount: 200
