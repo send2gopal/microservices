@@ -97,8 +97,9 @@ namespace microkart.basket.Controllers
                     UpdatedDate = DateTime.Now,
                 });
             }
+ 
             basketDatabaseContext.SaveChanges();
-            return Ok(cart);
+            return Ok(cartRequest);
         }
 
         [HttpPost("checkout")]

@@ -5,6 +5,8 @@ import { map, startWith, delay } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Product } from '../classes/product';
 import { environment } from '../../../environments/environment';
+import { ICart, ICheckoutRequest, OrderItems } from '../classes/Orders';
+import { Router } from '@angular/router';
 const state = {
   products: JSON.parse(localStorage['products'] || '[]'),
   wishlist: JSON.parse(localStorage['wishlistItems'] || '[]'),
@@ -22,14 +24,16 @@ export class ProductService {
   public Products;
 
   private baseURl = "";
+  private basketURl = "";
 
   constructor(private http: HttpClient,
+    private router: Router,
     private toastrService: ToastrService) {
-      if(true)
-        this.baseURl = environment.apiRoot + '/c/Api';
-      else      
-        this.baseURl = 'https://localhost:7266/Api';
-     }
+    if (true)
+      this.baseURl = environment.apiRoot + '/c/Api';
+    else
+      this.baseURl = 'https://localhost:7266/Api';
+  }
 
   /*
     ---------------------------------------------
@@ -40,9 +44,9 @@ export class ProductService {
   // Product
   private get products(): Observable<Product[]> {
     //this.Products = this.http.get<Product[]>('assets/data/products.json').pipe(map(data => data));
-    this.Products=this.http.get<Product[]>(this.baseURl+"/Admin/products").pipe(map(data => data));
+    this.Products = this.http.get<Product[]>(environment.apiRoot + "/c/Api/Admin/products").pipe(map(data => data));
     this.Products.subscribe(next => { localStorage['products'] = JSON.stringify(next) });
-    console.log(this.Products+"ff");
+    console.log(this.Products + "ff");
 
     return this.Products = this.Products.pipe(startWith(JSON.parse(localStorage['products'] || '[]')));
   }
@@ -54,12 +58,38 @@ export class ProductService {
 
   // Get Products By Slug
   public getProductBySlug(slug: string): Observable<Product> {
-    return this.products.pipe(map(items => { 
-      return items.find((item: any) => { 
-        return item.title.replace(' ', '-') === slug; 
-      }); 
+    return this.products.pipe(map(items => {
+      return items.find((item: any) => {
+        return item.title.replace(' ', '-') === slug;
+      });
     }));
   }
+  // Basket
+
+  private updateBasket(body: ICart) {
+    console.log("updating cart!");
+
+    //this.Products = this.http.get<Product[]>('assets/data/products.json').pipe(map(data => data));
+    this.http.post(environment.apiRoot +"/b/api/Basket", body).subscribe(r=> console.log("Cart Updated"))
+    return true;
+  }
+  
+  public placeOrder(body: ICheckoutRequest) {
+    console.log("Placing Order");
+    this.http.post(environment.apiRoot +"/b/api/Basket/checkout", body).subscribe((r)=> {
+      var item = {
+        shippingDetails: null,
+        product: state.cart,
+        //orderId: orderId,
+        totalAmount: 200
+    };
+    localStorage.setItem("checkoutItems", JSON.stringify(item));
+    localStorage.removeItem("cartItems");
+    this.router.navigate(['/shop/checkout/success', 0]);
+   });
+}
+
+
 
 
   /*
@@ -155,11 +185,11 @@ export class ProductService {
     const qty = product.quantity ? product.quantity : 1;
     const items = cartItem ? cartItem : product;
     const stock = this.calculateStockCounts(items, qty);
-    
-    if(!stock) return false
+
+    if (!stock) return false
 
     if (cartItem) {
-        cartItem.quantity += qty    
+      cartItem.quantity += qty
     } else {
       state.cart.push({
         ...product,
@@ -169,6 +199,24 @@ export class ProductService {
 
     this.OpenCart = true; // If we use cart variation modal
     localStorage.setItem("cartItems", JSON.stringify(state.cart));
+
+    var cart: ICart = {
+      isActive: true,
+      items: [],
+      userId: ""
+    };
+    state.cart.forEach(function (p) {
+      var cartItem: OrderItems = {
+        productId: p.id,
+        productImageUrl: p.images[0].src,
+        productName: p.title,
+        quantity: p.quantity,
+        unitPrice: p.price
+      };
+      cart.items.push(cartItem);
+    });
+    this.updateBasket(cart);
+
     return true;
   }
 
@@ -187,12 +235,12 @@ export class ProductService {
     })
   }
 
-    // Calculate Stock Counts
+  // Calculate Stock Counts
   public calculateStockCounts(product, quantity) {
     const qty = product.quantity + quantity
     const stock = product.stock
     if (stock < qty || stock == 0) {
-      this.toastrService.error('You can not add more items than available. In stock '+ stock +' items.');
+      this.toastrService.error('You can not add more items than available. In stock ' + stock + ' items.');
       return false
     }
     return true
@@ -203,6 +251,24 @@ export class ProductService {
     const index = state.cart.indexOf(product);
     state.cart.splice(index, 1);
     localStorage.setItem("cartItems", JSON.stringify(state.cart));
+
+    var cart: ICart = {
+      isActive: true,
+      items: [],
+      userId: ""
+    };
+    state.cart.forEach(function (p) {
+      var cartItem: OrderItems = {
+        productId: p.id,
+        productImageUrl: p.images[0].src,
+        productName: p.title,
+        quantity: p.quantity,
+        unitPrice: p.price
+      };
+      cart.items.push(cartItem);
+    });
+    console.log(cart);
+    this.updateBasket(cart);
     return true
   }
 
@@ -211,7 +277,7 @@ export class ProductService {
     return this.cartItems.pipe(map((product: Product[]) => {
       return product.reduce((prev, curr: Product) => {
         let price = curr.price;
-        if(curr.discount) {
+        if (curr.discount) {
           price = curr.price - (curr.price * curr.discount / 100)
         }
         return (prev + price * curr.quantity) * this.Currency.price;
@@ -227,7 +293,7 @@ export class ProductService {
 
   // Get Product Filter
   public filterProducts(filter: any): Observable<Product[]> {
-    return this.products.pipe(map(product => 
+    return this.products.pipe(map(product =>
       product.filter((item: Product) => {
         if (!filter.length) return true
         const Tags = filter.some((prev) => { // Match Tags
@@ -245,7 +311,7 @@ export class ProductService {
   // Sorting Filter
   public sortProducts(products: Product[], payload: string): any {
 
-    if(payload === 'ascending') {
+    if (payload === 'ascending') {
       return products.sort((a, b) => {
         if (a.id < b.id) {
           return -1;
@@ -290,7 +356,7 @@ export class ProductService {
         }
         return 0;
       })
-    } 
+    }
   }
 
   /*
@@ -306,22 +372,22 @@ export class ProductService {
     let paginateRange = 3;
 
     // ensure current page isn't out of range
-    if (currentPage < 1) { 
-      currentPage = 1; 
-    } else if (currentPage > totalPages) { 
-      currentPage = totalPages; 
+    if (currentPage < 1) {
+      currentPage = 1;
+    } else if (currentPage > totalPages) {
+      currentPage = totalPages;
     }
-    
+
     let startPage: number, endPage: number;
     if (totalPages <= 5) {
       startPage = 1;
       endPage = totalPages;
-    } else if(currentPage < paginateRange - 1){
+    } else if (currentPage < paginateRange - 1) {
       startPage = 1;
       endPage = startPage + paginateRange - 1;
     } else {
       startPage = currentPage - 1;
-      endPage =  currentPage + 1;
+      endPage = currentPage + 1;
     }
 
     // calculate start and end item indexes

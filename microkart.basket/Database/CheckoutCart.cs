@@ -12,7 +12,7 @@ namespace microkart.basket.Database
         string Country,
         string CardNumber,
         string CardHolderName,
-        DateTime CardExpiration,
+        string CardExpiration,
         string CardSecurityCode
     );
 }

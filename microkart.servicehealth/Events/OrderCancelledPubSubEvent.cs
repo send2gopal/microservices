@@ -8,7 +8,7 @@ namespace microkart.shared.Events
     string UserEmail,
     string CardNumber,
     string CardHolderName,
-    DateTime CardExpiration,
+    string CardExpiration,
     string CardSecurityNumber,
     decimal Amount,
     string PaymentReferenceNumber,

@@ -13,7 +13,7 @@ namespace microkart.shared.Events
     string Country,
     string CardNumber,
     string CardHolderName,
-    DateTime CardExpiration,
+    string CardExpiration,
     string CardSecurityNumber,
     Guid CorrelationId,
     CartRequest Cart)

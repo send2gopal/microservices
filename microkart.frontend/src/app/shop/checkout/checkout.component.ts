@@ -6,6 +6,9 @@ import { environment } from '../../../environments/environment';
 import { Product } from "../../shared/classes/product";
 import { ProductService } from "../../shared/services/product.service";
 import { OrderService } from "../../shared/services/order.service";
+import { ICheckoutRequest } from 'src/app/shared/classes/Orders';
+import { AuthService } from 'src/app/shared/services/auth.service';
+import { User } from 'oidc-client';
 
 @Component({
   selector: 'app-checkout',
@@ -14,32 +17,37 @@ import { OrderService } from "../../shared/services/order.service";
 })
 export class CheckoutComponent implements OnInit {
 
-  public checkoutForm:  FormGroup;
+  public checkoutForm: FormGroup;
   public products: Product[] = [];
-  public payPalConfig ? : IPayPalConfig;
+  public payPalConfig?: IPayPalConfig;
   public payment: string = 'Stripe';
-  public amount:  any;
-
+  public amount: any;
+  public user : User;
   constructor(private fb: FormBuilder,
     public productService: ProductService,
-    private orderService: OrderService) { 
-    this.checkoutForm = this.fb.group({
-      firstname: ['', [Validators.required, Validators.pattern('[a-zA-Z][a-zA-Z ]+[a-zA-Z]$')]],
-      lastname: ['', [Validators.required, Validators.pattern('[a-zA-Z][a-zA-Z ]+[a-zA-Z]$')]],
-      phone: ['', [Validators.required, Validators.pattern('[0-9]+')]],
-      email: ['', [Validators.required, Validators.email]],
-      address: ['', [Validators.required, Validators.maxLength(50)]],
-      country: ['', Validators.required],
-      town: ['', Validators.required],
-      state: ['', Validators.required],
-      postalcode: ['', Validators.required]
-    })
+    public authService: AuthService,
+    private orderService: OrderService) {
+    
   }
 
   ngOnInit(): void {
     this.productService.cartItems.subscribe(response => this.products = response);
     this.getTotal.subscribe(amount => this.amount = amount);
-    this.initConfig();
+    this.authService.getUserAsync()
+    .then(u => {
+      this.user = u;
+      this.checkoutForm = this.fb.group({
+        firstname: [this.user.profile.name, [Validators.required, Validators.pattern('[a-zA-Z][a-zA-Z ]+[a-zA-Z]$')]],
+        lastname: [this.user.profile.last_name, [Validators.required, Validators.pattern('[a-zA-Z][a-zA-Z ]+[a-zA-Z]$')]],
+        phone: [this.user.profile.phone_number, [Validators.required, Validators.pattern('[0-9]+')]],
+        email: [this.user.profile.email, [Validators.required, Validators.email]],
+        address: [this.user.profile.address_street, [Validators.required, Validators.maxLength(50)]],
+        country: [this.user.profile.address_country, Validators.required],
+        town: [this.user.profile.address_city, Validators.required],
+        state: [this.user.profile.address_state, Validators.required],
+        postalcode: [this.user.profile.address_zip_code, Validators.required]
+      });
+    });
   }
 
   public get getTotal(): Observable<number> {
@@ -48,70 +56,19 @@ export class CheckoutComponent implements OnInit {
 
   // Stripe Payment Gateway
   stripeCheckout() {
-    var handler = (<any>window).StripeCheckout.configure({
-      key: environment.stripe_token, // publishble key
-      locale: 'auto',
-      token: (token: any) => {
-        // You can access the token ID with `token.id`.
-        // Get the token ID to your server-side code for use.
-        this.orderService.createOrder(this.products, this.checkoutForm.value, token.id, this.amount);
-      }
-    });
-    handler.open({
-      name: 'Multikart',
-      description: 'Online Fashion Store',
-      amount: this.amount * 100
-    }) 
-  }
-
-  // Paypal Payment Gateway
-  private initConfig(): void {
-    this.payPalConfig = {
-        currency: this.productService.Currency.currency,
-        clientId: environment.paypal_token,
-        createOrderOnClient: (data) => < ICreateOrderRequest > {
-          intent: 'CAPTURE',
-          purchase_units: [{
-              amount: {
-                currency_code: this.productService.Currency.currency,
-                value: this.amount,
-                breakdown: {
-                    item_total: {
-                        currency_code: this.productService.Currency.currency,
-                        value: this.amount
-                    }
-                }
-              }
-          }]
-      },
-        advanced: {
-            commit: 'true'
-        },
-        style: {
-            label: 'paypal',
-            size:  'small', // small | medium | large | responsive
-            shape: 'rect', // pill | rect
-        },
-        onApprove: (data, actions) => {
-            this.orderService.createOrder(this.products, this.checkoutForm.value, data.orderID, this.getTotal);
-            console.log('onApprove - transaction was approved, but not authorized', data, actions);
-            actions.order.get().then(details => {
-                console.log('onApprove - you can get full order details inside onApprove: ', details);
-            });
-        },
-        onClientAuthorization: (data) => {
-            console.log('onClientAuthorization - you should probably inform your server about completed transaction at this point', data);
-        },
-        onCancel: (data, actions) => {
-            console.log('OnCancel', data, actions);
-        },
-        onError: err => {
-            console.log('OnError', err);
-        },
-        onClick: (data, actions) => {
-            console.log('onClick', data, actions);
-        }
+    var request: ICheckoutRequest = {
+      userEmail: this.checkoutForm.get('email').value,
+      city: this.checkoutForm.get('town').value,
+      street: this.checkoutForm.get('address').value,
+      aptorunit: "b",
+      state: this.checkoutForm.get('state').value,
+      zipcode: this.checkoutForm.get('postalcode').value,
+      country: this.checkoutForm.get('country').value,
+      cardNumber: this.user.profile.card_number,
+      cardHolderName: this.user.profile.card_holder,
+      cardExpiration: this.user.profile.card_expiration,
+      cardSecurityCode: this.user.profile.card_security_number,
     };
+    this.productService.placeOrder(request);
   }
-
 }

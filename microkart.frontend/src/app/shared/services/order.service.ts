@@ -52,17 +52,17 @@ export class OrderService {
   }
 
   // Create order
-  public createOrder(product: any, details: any, orderId: any, amount: any) {
+  public createOrder(product: any, details: any, amount: any) {
     var item = {
         shippingDetails: details,
         product: product,
-        orderId: orderId,
+        //orderId: orderId,
         totalAmount: amount
     };
     state.checkoutItems = item;
     localStorage.setItem("checkoutItems", JSON.stringify(item));
     localStorage.removeItem("cartItems");
-    this.router.navigate(['/shop/checkout/success', orderId]);
+    this.router.navigate(['/shop/checkout/success', 0]);
   }
   
 }
