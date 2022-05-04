@@ -12,6 +12,6 @@ start cmd /C docker build -f microkart.notification/Dockerfile -t microkart-noti
 
 docker build  -t microkart-frontend:latest -f microkart.frontend/Dockerfile . --progress=plain --no-cache
 
- #helm uninstall  microkart-app --wait
+helm uninstall  microkart-app --wait
 
- #helm install  microkart-app .\k8s\microkart-app\ --wait
+helm install  microkart-app .\k8s\microkart-app\ --wait

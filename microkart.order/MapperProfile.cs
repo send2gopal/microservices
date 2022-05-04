@@ -32,6 +32,8 @@ namespace microkart.order
                     return "Cancelled";
                 case 6:
                     return "Payment Failed";
+                case 7:
+                    return "Delivered";
                 default:
                     return "Failed";
             }

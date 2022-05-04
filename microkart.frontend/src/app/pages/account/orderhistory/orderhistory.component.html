@@ -39,7 +39,7 @@
                   <p>{{ order.orderStatus.name }}</p>
               </td>
               <td>
-                  <a href="javascript:void(0)" (click)="cancelOrder(order.id)" class="icon mr-3">
+                  <a href="javascript:void(0)" *ngIf="order.orderStatus.id != 5" (click)="cancelOrder(order.id)" class="icon mr-3">
                     <i class="ti-close"></i>
                   </a>
               </td>
