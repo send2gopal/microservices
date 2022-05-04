@@ -81,8 +81,11 @@ export class ProductService {
         shippingDetails: {},
         product: state.cart,
         //orderId: orderId,
-        totalAmount: 200
+        totalAmount: 0
     };
+    state.cart.forEach(function (p) {
+      item.totalAmount += (p.price - (p.price * (p.discount/100))) * p.quantity;
+    });
     localStorage.setItem("checkoutItems", JSON.stringify(item));
     localStorage.removeItem("cartItems");
     this.router.navigate(['/shop/checkout/success', 0]);
