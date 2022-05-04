@@ -18,7 +18,7 @@ export class CollectionLeftSidebarComponent implements OnInit {
   public colors: any[] = [];
   public size: any[] = [];
   public minPrice: number = 0;
-  public maxPrice: number = 1200;
+  public maxPrice: number = 6000;
   public tags: any[] = [];
   public category: string;
   public pageNo: number = 1;

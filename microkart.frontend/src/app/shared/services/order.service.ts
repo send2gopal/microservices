@@ -19,7 +19,7 @@ export class OrderService {
   constructor(private http: HttpClient,
     private toastrService: ToastrService,
     private router: Router) {
-      if(!environment.production)
+      if(true)
         this.baseURl = environment.apiRoot + '/o/api';
       else      
         this.baseURl = 'https://localhost:7179/Api';
@@ -31,6 +31,15 @@ export class OrderService {
 
   public cancel(orderId:number): Observable<void> {
     return this.http.delete<void>(this.baseURl+"/Order/"+orderId);
+  }
+
+  // Get Checkout Items
+  public get saveCart(): Observable<any> {
+    const itemsStream = new Observable(observer => {
+      observer.next(state.checkoutItems);
+      observer.complete();
+    });
+    return <Observable<any>>itemsStream;
   }
 
   // Get Checkout Items

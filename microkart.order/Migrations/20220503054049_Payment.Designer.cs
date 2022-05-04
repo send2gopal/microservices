@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using microkart.order.Database;
 
@@ -11,9 +12,10 @@ using microkart.order.Database;
 namespace microkart.order.Migrations
 {
     [DbContext(typeof(OrderDatabaseContext))]
-    partial class OrderDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220503054049_Payment")]
+    partial class Payment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

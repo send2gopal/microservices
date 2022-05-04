@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, HostListener } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
+import { OrderService } from '../../services/order.service';
 
 @Component({
   selector: 'app-header-one',
@@ -15,12 +16,15 @@ export class HeaderOneComponent implements OnInit {
 
   public stick: boolean = false;
   public isUserAuthenticated: boolean = false;
-  constructor(private _authService: AuthService) { }
+  constructor(private _authService: AuthService, private _orderService: OrderService) { }
 
   ngOnInit(): void {
     this._authService.loginChanged
       .subscribe(res => {
         this.isUserAuthenticated = res;
+        if(this.isUserAuthenticated){
+
+        }
       });
   }
 
