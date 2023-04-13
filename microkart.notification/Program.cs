@@ -3,7 +3,6 @@ using microkart.notification;
 using microkart.servicehealth;
 using microkart.shared.Abstraction;
 using microkart.shared.Daprbuildingblocks;
-using microkart.notification;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,8 +23,8 @@ builder.Services.AddHealthChecks()
     .AddDapr();
 builder.Services.AddDaprClient();
 
-builder.AddDbContextDevelopment();
-//await builder.AddDbContextAsync();
+//builder.AddDbContextDevelopment();
+await builder.AddDbContextAsync();
 
 // Add Application services
 builder.Services.AddScoped<IEventBus, DaprEventBus>();
@@ -62,6 +61,8 @@ app.MapSubscribeHandler();
 //app.ApplyDatabaseMigration();
 try
 {
+    app.ApplyDatabaseMigration();
+
     app.Logger.LogInformation("Starting web host ({ApplicationName})...", StartupExtensions.AppName);
     app.Run();
 }

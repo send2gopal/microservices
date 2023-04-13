@@ -1,8 +1,10 @@
+using Dapr.Client;
 using microkart.order.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using System.IdentityModel.Tokens.Jwt;
+using static microkart.shared.Constants.Dapr;
 
 namespace microkart.Order;
 public static class StartupExtensions
@@ -63,6 +65,29 @@ public static class StartupExtensions
 
         builder.Services.AddDbContext<OrderDatabaseContext>(
                    options => options.UseSqlServer(defaultConnectionString));
+    }
+    public static async Task AddDbContextAsync(this WebApplicationBuilder builder)
+    {
+
+        using var client = new DaprClientBuilder().Build();
+        var secret = await client.GetSecretAsync(SECRET_STORE_NAME, "microkart-app-secret");
+        var defaultConnectionString = secret["ORDER_DB_CONNECTION"];
+
+        Console.WriteLine($"Result: {string.Join(", ", secret)}");
+        Console.WriteLine($"ConnectionString: {defaultConnectionString}");
+
+        builder.Services.AddDbContext<OrderDatabaseContext>(
+                   options => options.UseSqlServer(defaultConnectionString));
+
+
+    }
+
+    public static void ApplyDatabaseMigration(this WebApplication app)
+    {
+
+        using var scope = app.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<OrderDatabaseContext>();
+        context.Database.Migrate();
     }
 
     public static void AddIdentityServer(this WebApplicationBuilder builder)

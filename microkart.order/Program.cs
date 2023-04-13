@@ -26,7 +26,8 @@ builder.Services.AddSingleton(mapper);
 builder.AddSwaggerWithAuth();
 builder.Services.AddHealthChecks().AddDapr();
 builder.Services.AddDaprClient();
-builder.AddDbContext();
+//builder.AddDbContext();
+await builder.AddDbContextAsync();
 
 // Add Application services
 builder.Services.AddScoped<IEventBus, DaprEventBus>();
@@ -70,9 +71,10 @@ app.MapSubscribeHandler();
 
 
 
-//app.ApplyDatabaseMigration();
 try
 {
+    app.ApplyDatabaseMigration();
+
     app.Logger.LogInformation("Starting web host ({ApplicationName})...", StartupExtensions.AppName);
     app.Run();
 }

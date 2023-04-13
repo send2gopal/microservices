@@ -18,7 +18,7 @@ public static class StartupExtensions
 
         using var client = new DaprClientBuilder().Build();
         var secret = await client.GetSecretAsync(SECRET_STORE_NAME, "microkart-app-secret");
-        var defaultConnectionString = secret["BASKET_DB_CONNECTION"];
+        var defaultConnectionString = secret["NOTIFICATION_DB_CONNECTION"];
 
         Console.WriteLine($"Result: {string.Join(", ", secret)}");
         Console.WriteLine($"ConnectionString: {defaultConnectionString}");
