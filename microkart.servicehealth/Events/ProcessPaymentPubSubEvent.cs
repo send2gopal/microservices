@@ -7,7 +7,7 @@ namespace microkart.shared.Events
     int OrderId,
     string CardNumber,
     string CardHolderName,
-    DateTime CardExpiration,
+    string CardExpiration,
     string CardSecurityNumber,
     decimal Amount,
     Guid CorrelationId)
@@ -18,7 +18,7 @@ namespace microkart.shared.Events
     int OrderId,
     string CardNumber,
     string CardHolderName,
-    DateTime CardExpiration,
+    string CardExpiration,
     string CardSecurityNumber,
     decimal Amount,
     Guid CorrelationId)

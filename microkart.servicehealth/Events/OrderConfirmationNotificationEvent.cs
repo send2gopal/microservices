@@ -8,4 +8,18 @@ namespace microkart.shared.Events
     string email,
     Guid CorrelationId)
     : PubSubEvent;
+    
+    public record OrderShippedNotificationEvent(
+    Guid UserId,
+    int OrderId,
+    string email,
+    Guid CorrelationId)
+    : PubSubEvent;
+
+    public record OrderDeliverNotificationEvent(
+    Guid UserId,
+    int OrderId,
+    string email,
+    Guid CorrelationId)
+    : PubSubEvent;
 }

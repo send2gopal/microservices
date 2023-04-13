@@ -929,13 +929,10 @@ form .col-md-4 {
 }
 
 .es-header {
-    background: url(../images/header.jpg) center -2.7rem no-repeat,linear-gradient(90deg, #7979ac 0%, #7979ac 35%, #0d2092 65%, #0d2092 100%);
+    background: url(../images/header.jpg) center -2.7rem no-repeat,linear-gradient(90deg, #d884af 0%, #eb0948 35%, #db0d2e 65%, #f90542 100%);
     background-size: auto, auto;
-    background-size: 94rem,auto;
-    height: 13rem;
+    height: 17rem;
     padding-top: 2.25rem;
-    position: relative;
-    transition: all .35s;
 }
 
 .es-header-brand {

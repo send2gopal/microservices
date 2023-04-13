@@ -38,12 +38,6 @@
 
             ViewData["ReturnUrl"] = returnUrl;
 
-            if (vm.IsExternalLoginOnly)
-            {
-                // we only have one option for logging in and it's an external provider
-                return RedirectToAction("Challenge", "External", new { scheme = vm.ExternalLoginScheme, returnUrl });
-            }
-
             return View(vm);
         }
 
@@ -79,7 +73,6 @@
                 }
                 else
                 {
-                    // since we don't have a valid context, then we just go back to the home page
                     return Redirect("~/");
                 }
             }
@@ -212,23 +205,8 @@
                     Username = context?.LoginHint,
                 };
 
-                if (!local)
-                {
-                    vm.ExternalProviders = new[] { new ExternalProvider { AuthenticationScheme = context.IdP } };
-                }
-
                 return vm;
             }
-
-            var schemes = await _schemeProvider.GetAllSchemesAsync();
-
-            var providers = schemes
-                .Where(x => x.DisplayName != null)
-                .Select(x => new ExternalProvider
-                {
-                    DisplayName = x.DisplayName ?? x.Name,
-                    AuthenticationScheme = x.Name
-                }).ToList();
 
             var allowLocal = true;
             if (context?.Client.ClientId != null)
@@ -237,11 +215,6 @@
                 if (client != null)
                 {
                     allowLocal = client.EnableLocalLogin;
-
-                    if (client.IdentityProviderRestrictions != null && client.IdentityProviderRestrictions.Any())
-                    {
-                        providers = providers.Where(provider => client.IdentityProviderRestrictions.Contains(provider.AuthenticationScheme)).ToList();
-                    }
                 }
             }
 
@@ -250,8 +223,7 @@
                 AllowRememberLogin = AccountOptions.AllowRememberLogin,
                 EnableLocalLogin = allowLocal && AccountOptions.AllowLocalLogin,
                 ReturnUrl = returnUrl,
-                Username = context?.LoginHint,
-                ExternalProviders = providers.ToArray()
+                Username = context?.LoginHint
             };
         }
 
@@ -323,6 +295,86 @@
             }
 
             return vm;
+        }
+
+        /// <summary>
+        /// Entry point into the login workflow
+        /// </summary>
+        [HttpGet]
+        public IActionResult Register(string returnUrl)
+        {
+            
+            return View(new ApplicationUserViewModel { ReturnURl=returnUrl});
+        }
+
+        /// <summary>
+        /// Entry point into the login workflow
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(ApplicationUserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var userToRegister = new ApplicationUser
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    LastName = model.LastName,
+                    Name = model.FirstName,
+                    UserName = model.Email,
+                    Email = model.Email,
+                    PhoneNumber = string.Empty,
+                    ZipCode = model.ZipCode,
+                    State = model.State,
+                    Street = model.Street,
+                    City = model.City,
+                    Country = model.Country,
+                    EmailConfirmed = true,
+                    CardHolderName = string.Empty,
+                    CardNumber = string.Empty,
+                    CardType = 0,
+                    Expiration = string.Empty,
+                    SecurityNumber = string.Empty,
+                };
+
+                var registerResult = await _userManager.CreateAsync(userToRegister, model.Password);
+                if (ModelState.IsValid)
+                {
+                    // check if we are in the context of an authorization request
+                    var context = await _interaction.GetAuthorizationContextAsync(model.ReturnURl);
+
+
+                    var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, lockoutOnFailure: false);
+                    if (result.Succeeded)
+                    {
+                        var user = await _userManager.FindByNameAsync(model.Email);
+                        await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName, clientId: context?.Client.ClientId));
+
+                        if (context != null)
+                        {
+                            if (context.IsNativeClient())
+                            {
+                                return this.LoadingPage("Redirect", model.ReturnURl);
+                            }
+                            return Redirect(model.ReturnURl);
+                        }
+
+                        if (Url.IsLocalUrl(model.ReturnURl))
+                        {
+                            return Redirect(model.ReturnURl);
+                        }
+                        else if (string.IsNullOrEmpty(model.ReturnURl))
+                        {
+                            return Redirect("~/");
+                        }
+                        else
+                        {
+                            throw new Exception("invalid return URL");
+                        }
+                    }
+                }
+            }
+                return Redirect(model.ReturnURl);
         }
     }
 }

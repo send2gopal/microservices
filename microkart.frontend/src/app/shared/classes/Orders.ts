@@ -44,3 +44,23 @@
         paymentInformation: PaymentInformation;
     }
 
+    export interface ICart {
+        userId: string;
+        isActive: boolean;
+        items: OrderItems[];
+    }
+
+    export interface ICheckoutRequest {
+        userEmail: string;
+        city: string;
+        street: string;
+        aptorunit: string;
+        state: string;
+        zipcode: string;
+        country: string;
+        cardNumber: string;
+        cardHolderName: string;
+        cardExpiration: string;
+        cardSecurityCode: string;
+    }
+

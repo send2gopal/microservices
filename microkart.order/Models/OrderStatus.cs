@@ -9,6 +9,7 @@
         public static readonly OrderStatus Shipped = new OrderStatus(4, nameof(Shipped));
         public static readonly OrderStatus Cancelled = new OrderStatus(5, nameof(Cancelled));
         public static readonly OrderStatus PaymentFailed = new OrderStatus(6, nameof(PaymentFailed));
+        public static readonly OrderStatus Delivered = new OrderStatus(7, nameof(Delivered));
 
 
         public int Id { get; set; }

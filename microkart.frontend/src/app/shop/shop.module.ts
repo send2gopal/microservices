@@ -8,9 +8,6 @@ import { ShopRoutingModule } from './shop-routing.module';
 
 // Product Details Components
 import { ProductLeftSidebarComponent } from './product/sidebar/product-left-sidebar/product-left-sidebar.component';
-import { ProductRightSidebarComponent } from './product/sidebar/product-right-sidebar/product-right-sidebar.component';
-import { ProductNoSidebarComponent } from './product/sidebar/product-no-sidebar/product-no-sidebar.component';
-import { ThreeColumnComponent } from './product/three-column/three-column.component';
 import { BundleProductComponent } from './product/bundle-product/bundle-product.component';
 import { ImageOutsideComponent } from './product/image-outside/image-outside.component';
 
@@ -42,9 +39,6 @@ import { SuccessComponent } from './checkout/success/success.component';
 @NgModule({
   declarations: [
     ProductLeftSidebarComponent, 
-    ProductRightSidebarComponent,
-    ProductNoSidebarComponent,
-    ThreeColumnComponent,
     BundleProductComponent,
     ImageOutsideComponent,
     ServicesComponent,

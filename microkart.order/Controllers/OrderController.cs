@@ -135,5 +135,41 @@ namespace microkart.basket.Controllers
             }
             return result;
         }
+
+        [HttpGet("{id}/ship")]
+        [ProducesResponseType(typeof(OrderResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<OrderResponse>> ShipOrder([FromRoute] int id, [FromHeader(Name = "x-correlation-id")] string correlationId)
+        {
+            var userId = _userService.GetUserIdentity();
+            var order = await orderContext.Orders.Include(e => e.Items).FirstOrDefaultAsync(c => c.Id == id);
+            if (order != null)
+            {
+                var orderChngedEvent = new OrderChngedPubSubEvent(order.Id,
+                                                                    4, //Shipped
+                                                                    new List<string> { },
+                                                                    Guid.Parse(correlationId));
+                await _eventBus.PublishAsync(orderChngedEvent);
+                return Accepted();
+            }
+            return NotFound();
+        }
+
+        [HttpGet("{id}/deliver")]
+        [ProducesResponseType(typeof(OrderResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<OrderResponse>> DeliverOrder([FromRoute] int id, [FromHeader(Name = "x-correlation-id")] string correlationId)
+        {
+            var userId = _userService.GetUserIdentity();
+            var order = await orderContext.Orders.Include(e => e.Items).FirstOrDefaultAsync(c => c.Id == id);
+            if (order != null)
+            {
+                var orderChngedEvent = new OrderChngedPubSubEvent(order.Id,
+                                                                    7, //Shipped
+                                                                    new List<string> { },
+                                                                    Guid.Parse(correlationId));
+                await _eventBus.PublishAsync(orderChngedEvent);
+                return Accepted();
+            }
+            return NotFound();
+        }
     }
 }

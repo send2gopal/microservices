@@ -97,8 +97,9 @@ namespace microkart.basket.Controllers
                     UpdatedDate = DateTime.Now,
                 });
             }
+ 
             basketDatabaseContext.SaveChanges();
-            return Ok(cart);
+            return Ok(cartRequest);
         }
 
         [HttpPost("checkout")]
@@ -108,7 +109,7 @@ namespace microkart.basket.Controllers
         {
             var userId = _userService.GetUserIdentity();
 
-            var cart = await basketDatabaseContext.Carts.Include(c=> c.Items).FirstOrDefaultAsync(c => c.UserId == userId);
+            var cart = await basketDatabaseContext.Carts.Include(c=> c.Items).FirstOrDefaultAsync(c => c.UserId == userId && c.IsActive);
             if (cart == null)
             {
                 return BadRequest();

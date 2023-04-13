@@ -6,7 +6,6 @@ namespace microkart.basket.Database
     {
         public DbSet<CartItem> CartItems => Set<CartItem>();
         public DbSet<Cart> Carts => Set<Cart>();
-        public DbSet<Order> Orders => Set<Order>();
 
         public BasketDatabaseContext(DbContextOptions<BasketDatabaseContext> options)
             : base(options)

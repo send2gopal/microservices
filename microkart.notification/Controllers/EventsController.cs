@@ -1,8 +1,6 @@
 using Dapr;
-using microkart.shared.Abstraction;
 using microkart.shared.Daprbuildingblocks;
 using microkart.shared.Events;
-using microkart.shared.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace microkart.payment.Controllers
@@ -48,11 +46,12 @@ namespace microkart.payment.Controllers
         }
 
         [Topic(DaprEventBus.PUBSUB_NAME, "OrderShippedNotificationEvent")]
-        public void OrderShipped(OrderConfirmationNotificationEvent integrationEvent)
+        [HttpPost("OrderShipped")]
+        public void OrderShipped(OrderShippedNotificationEvent integrationEvent)
         {
             if (integrationEvent.CorrelationId != Guid.Empty)
             {
-                _logger.LogWarning("Received OrderConfirmationNotificationEvent event {@IntegrationEvent}", integrationEvent);
+                _logger.LogWarning("Order has shipped {@IntegrationEvent}", integrationEvent);
             }
             else
             {
@@ -60,17 +59,32 @@ namespace microkart.payment.Controllers
             }
         }
 
-        [Topic(DaprEventBus.PUBSUB_NAME, "OrderDeliveredShippedNotificationEvent")]
-        public void OrderDelivered(OrderConfirmationNotificationEvent integrationEvent)
+        [HttpPost("OrderDelivered")]
+        [Topic(DaprEventBus.PUBSUB_NAME, "OrderDeliverNotificationEvent")]
+        public void OrderDelivered(OrderDeliverNotificationEvent integrationEvent)
         {
             if (integrationEvent.CorrelationId != Guid.Empty)
             {
-                _logger.LogWarning("Received OrderConfirmationNotificationEvent event {@IntegrationEvent}", integrationEvent);
+                _logger.LogWarning("Order has delivered {@IntegrationEvent}", integrationEvent);
             }
             else
             {
                 _logger.LogWarning("Invalid IntegrationEvent - RequestId is missing - {@IntegrationEvent}", integrationEvent);
             }
         }
+
+        //[HttpPost("SendInvoice")]
+        //[Topic(DaprEventBus.PUBSUB_NAME, "InvoiceSendNotificationEvent")]
+        //public void SendInvoice(OrderDeliverNotificationEvent integrationEvent)
+        //{
+        //    if (integrationEvent.CorrelationId != Guid.Empty)
+        //    {
+        //        _logger.LogWarning("Received OrderConfirmationNotificationEvent event {@IntegrationEvent}", integrationEvent);
+        //    }
+        //    else
+        //    {
+        //        _logger.LogWarning("Invalid IntegrationEvent - RequestId is missing - {@IntegrationEvent}", integrationEvent);
+        //    }
+        //}
     }
 }

@@ -6,6 +6,7 @@ using microkart.shared.Daprbuildingblocks;
 using microkart.shared.Events;
 using microkart.shared.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace microkart.order.Controllers
 {
@@ -72,7 +73,7 @@ namespace microkart.order.Controllers
                     {
                         UserId = integrationEvent.UserId,
                         Amount = integrationEvent.Cart.Items.Sum(s => s.Totalprice),
-                        CardExpiration = integrationEvent.CardExpiration,
+                        CardExpiration = DateTime.Now.ToString("yyyy/MM/dd"),
                         CardHolderName = integrationEvent.CardHolderName,
                         CardNumber = integrationEvent.CardNumber,
                         CardSecurityNumber = integrationEvent.CardSecurityNumber,
@@ -87,7 +88,7 @@ namespace microkart.order.Controllers
                     UpdatedBy = integrationEvent.UserId.ToString(),
                     UpdatedDate = DateTime.Now,
                 };
-
+                _logger.LogWarning("Creating order - {@order}", order);
                 var entity = orderDatabaseContext.Orders.Add(order);
                 orderDatabaseContext.SaveChanges();
 
@@ -107,7 +108,7 @@ namespace microkart.order.Controllers
 
         [HttpPost("OrderChnged")]
         [Topic(DaprEventBus.PUBSUB_NAME, "OrderChngedPubSubEvent")]
-        public async Task HandleStstusChanged(OrderChngedPubSubEvent integrationEvent)
+        public async Task HandleStatusChanged(OrderChngedPubSubEvent integrationEvent)
         {
             var Order = orderDatabaseContext.Orders
                 .FirstOrDefault(o => o.Id == integrationEvent.OrderId);
@@ -140,13 +141,24 @@ namespace microkart.order.Controllers
                 }
                 else if (integrationEvent.Status == OrderStatus.Shipped.Id)
                 {
-                    //var orderConfirmationNotification = new OrderConfirmationNotificationEvent(
-                    //        order.UserId,
-                    //        order.Id,
-                    //        order.Enail,
-                    //        integrationEvent.CorrelationId
-                    //    );
-                    //await _eventBus.PublishAsync(orderConfirmationNotification);
+                    var orderShippedEvent = new OrderShippedNotificationEvent(
+                            order.UserId,
+                            order.Id,
+                            order.Enail,
+                            integrationEvent.CorrelationId
+                        );
+                    await _eventBus.PublishAsync(orderShippedEvent);
+                    _logger.LogWarning("Order Shipped - {@IntegrationEvent}", integrationEvent);
+                }
+                else if (integrationEvent.Status == OrderStatus.Delivered.Id)
+                {
+                    var orderDeliverEvent = new OrderDeliverNotificationEvent(
+                            order.UserId,
+                            order.Id,
+                            order.Enail,
+                            integrationEvent.CorrelationId
+                        );
+                    await _eventBus.PublishAsync(orderDeliverEvent);
                     _logger.LogWarning("Order Shipped - {@IntegrationEvent}", integrationEvent);
                 }
                 order.OrderStatus = integrationEvent.Status;
@@ -163,13 +175,14 @@ namespace microkart.order.Controllers
         [Topic(DaprEventBus.PUBSUB_NAME, "InventoryVaidationResultPubSubEvent")]
         public async Task InventoryVaidationResponseHandler(InventoryVaidationResultPubSubEvent integrationEvent)
         {
-            var Order = orderDatabaseContext.Orders
-                .FirstOrDefault(o => o.Id == integrationEvent.OrderId);
-
             if (integrationEvent.CorrelationId != Guid.Empty)
             {
                 _logger.LogInformation("Processing InventoryVaidationResultPubSubEvent {@IntegrationEvent}", integrationEvent);
-                var order = orderDatabaseContext.Orders.FirstOrDefault(o => o.Id == integrationEvent.OrderId);
+                var order = orderDatabaseContext.Orders
+                    .Include(e => e.Items)
+                    .Include(e => e.PaymentInformation)
+                    .Include(e => e.ShippingAddress)
+                    .FirstOrDefault(o => o.Id == integrationEvent.OrderId);
                 if (order == null) throw new Exception($"Invalid Order ID {integrationEvent.OrderId}");
 
                 if (integrationEvent.errors.Any())
@@ -195,6 +208,8 @@ namespace microkart.order.Controllers
                         order.Amount,
                         integrationEvent.CorrelationId
                         );
+
+                _logger.LogWarning("Sending payment process event {@ProcessPaymentEvent}", processPaymentEvent);
 
                 await _eventBus.PublishAsync(processPaymentEvent);
 

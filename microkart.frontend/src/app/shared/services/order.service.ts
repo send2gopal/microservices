@@ -19,7 +19,7 @@ export class OrderService {
   constructor(private http: HttpClient,
     private toastrService: ToastrService,
     private router: Router) {
-      if(!environment.production)
+      if(true)
         this.baseURl = environment.apiRoot + '/o/api';
       else      
         this.baseURl = 'https://localhost:7179/Api';
@@ -34,6 +34,15 @@ export class OrderService {
   }
 
   // Get Checkout Items
+  public get saveCart(): Observable<any> {
+    const itemsStream = new Observable(observer => {
+      observer.next(state.checkoutItems);
+      observer.complete();
+    });
+    return <Observable<any>>itemsStream;
+  }
+
+  // Get Checkout Items
   public get checkoutItems(): Observable<any> {
     const itemsStream = new Observable(observer => {
       observer.next(state.checkoutItems);
@@ -43,17 +52,17 @@ export class OrderService {
   }
 
   // Create order
-  public createOrder(product: any, details: any, orderId: any, amount: any) {
+  public createOrder(product: any, details: any, amount: any) {
     var item = {
         shippingDetails: details,
         product: product,
-        orderId: orderId,
+        //orderId: orderId,
         totalAmount: amount
     };
     state.checkoutItems = item;
     localStorage.setItem("checkoutItems", JSON.stringify(item));
     localStorage.removeItem("cartItems");
-    this.router.navigate(['/shop/checkout/success', orderId]);
+    this.router.navigate(['/shop/checkout/success', 0]);
   }
   
 }

@@ -140,8 +140,9 @@ namespace microkart.order.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime>("CardExpiration")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("CardExpiration")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CardHolderName")
                         .IsRequired()
@@ -178,7 +179,7 @@ namespace microkart.order.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PaymentInformation");
+                    b.ToTable("PaymentInformations");
                 });
 
             modelBuilder.Entity("microkart.order.Database.ShippingAddress", b =>

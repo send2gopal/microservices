@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using Nanoid;
+using Amazon.S3.Model;
 
 namespace microkart.catalog.Controllers;
 
@@ -93,24 +94,24 @@ public class AdminController : ControllerBase
             Category = productCatagory,
             Brand = brand,
             collection = model.collectionVal,
-            Variants = new List<ProductVariant> {
-                new ProductVariant {
-                    sku="sku1",
-                    size="s",
-                    color="White",
+            //Variants = new List<ProductVariant> {
+            //    new ProductVariant {
+            //        sku="sku1",
+            //        size="s",
+            //        color="White",
 
-                },
-                new ProductVariant {
-                     sku="sku2",
-                    size="m",
-                    color="Yellow"
-                },
-                new ProductVariant {
-                     sku="sku3",
-                    size="m",
-                    color="pink"
-                },
-            }
+            //    },
+            //    new ProductVariant {
+            //         sku="sku2",
+            //        size="m",
+            //        color="Yellow"
+            //    },
+            //    new ProductVariant {
+            //         sku="sku3",
+            //        size="m",
+            //        color="pink"
+            //    },
+            //}
         };
 
         var Prodctresult = await catalogDatabaseContext.Products.AddAsync(product);
@@ -196,24 +197,24 @@ public class AdminController : ControllerBase
     }
 
 
-    [HttpPost("MapProductImage")]
+    [HttpPost("product/{Id}/MapProductImage")]
     [Consumes("multipart/form-data")]
-    public async Task<ActionResult<ProductImagesViewModel>> UploadProdcutImageFile([FromForm] ImageModel model)
+    public async Task<ActionResult<ProductImagesViewModel>> UploadProdcutImageFile([FromForm] IFormFile file)
     {
-        var product = catalogDatabaseContext.Products.Where(x => x.Id == model.productId).FirstOrDefault();
+        var product = catalogDatabaseContext.Products.Where(x => x.Id == 1).FirstOrDefault();
         if (product == null) return NotFound();
         var awsConfig = GetAwsConfig();
 
-        string s3FileName = $"{ await Nanoid.Nanoid.GenerateAsync(size: 10) }{ Path.GetExtension(model.Image.FileName)}";
+        string s3FileName = $"{ await Nanoid.Nanoid.GenerateAsync(size: 10) }{ Path.GetExtension(file.FileName)}";
 
-        await UploadToS3(model.Image, awsConfig, s3FileName);
+        await UploadToS3(file, awsConfig, s3FileName);
 
 
         var productImage = new ProductImages
         {
 
             Source = string.Concat(awsConfig.S3Url, $"/{s3FileName}"),
-            AltText = string.Concat("alt image"),
+            AltText = "alt image",
             CraetedDate = DateTime.Now,
             CreatedBy = "gthakur",
             UpdatedBy = "gthakur",
@@ -231,26 +232,26 @@ public class AdminController : ControllerBase
             src = Prodctresult.Entity.Source
         } ;
     }
-
-    private async Task UploadToS3(IFormFile file, AwsConfigOptions awsConfig, string filename)
+    private async Task UploadToS3(IFormFile file, AwsConfigOptions awsConfig, string filename, string bucketName = "microkart")
     {
+        //foreach (IFormFile file in files)
+        {
+            if (file.Length > 0)
+            {
+                string filePath = Path.Combine(@"C:\dapr", file.FileName);
+                using (Stream fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(fileStream);
+                }
+            }
+        }
+
         //for this example, try giving S3 full permissions
         using (var client = new AmazonS3Client(awsConfig.Accesskey, awsConfig.Secret, RegionEndpoint.USEast1))
         {
-            using (var newMemoryStream = new MemoryStream())
-            {
-                file.CopyTo(newMemoryStream);
-
-                var uploadRequest = new TransferUtilityUploadRequest
-                {
-                    InputStream = newMemoryStream,
-                    Key = filename, // filename
-                    BucketName = "microkart"
-                };
-
-                var fileTransferUtility = new TransferUtility(client);
-                await fileTransferUtility.UploadAsync(uploadRequest);
-            }
+            using var fs = file.OpenReadStream();
+            var fileTransferUtility = new TransferUtility(client);
+            await fileTransferUtility.UploadAsync(file.OpenReadStream(), bucketName, filename);
         }
     }
 
@@ -258,14 +259,6 @@ public class AdminController : ControllerBase
     {
         var awsOptions = config.GetSection(AwsConfigOptions.AwsConfig)
                                                      .Get<AwsConfigOptions>();
-        //var accesskey = builder.Configuration["AwsConfig:AccessKey"];
-        //var secret = builder.Configuration["AwsConfig:Secret"];
-
-        //return new AwsOptions
-        //{
-        //    Accesskey = accesskey,
-        //    Secret = secret
-        //};
         return awsOptions;
     }
 }
