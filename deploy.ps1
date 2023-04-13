@@ -1,21 +1,24 @@
-# Install k8s dashboard
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml
+
 
 kubectl apply -f .\k8s\dashboard-adminuser.yaml
-kubectl -n kube-system describe secret admin-user -n kubernetes-dashboard
+#kubectl -n kubernetes-dashboard describe secret sa/admin-user 
 Write-Host "Use user secret to login dashboard" -ForegroundColor Red
+#kubectl -n kubernetes-dashboard create token admin-user
+
+# Install k8s dashboard
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
 
 # Update HELM repo
 helm repo update
 
 # Install dapt to cluster
 Write-Host "Installing dapr to cluster" -ForegroundColor Green
-#helm upgrade --install dapr dapr/dapr --version=1.7 --namespace dapr-system --create-namespace --wait
+helm upgrade --install dapr dapr/dapr --version=1.7 --namespace dapr-system --create-namespace --wait
 Write-Host "Dapr installation finished" -ForegroundColor Green
 
 # Install seq server to cluster
 Write-Host "Installing SEQ Loging server to cluster" -ForegroundColor Green
-#helm install  seq-server datalust/seq --wait
+helm install  seq-server datalust/seq --wait
 Write-Host "SEQ server installation finished" -ForegroundColor Green
 
 # Install rabbitMQ to cluster
